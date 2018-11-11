@@ -52,14 +52,6 @@ public void loadFromFile(String sourceFile);
 public BTreeNodeInterface searchKey(TreeObjectInterface key);
 
 
-/** Searches for a key within a subtree formed by a node. Returns the node
-  * containing the key, or null if it is not found.
-  * @param node Node to search for the key from.
-  * @param key Key value to search for.
-  * @return Node containing the key, or null if not found.                    */
-public BTreeNodeInterface searchKey(BTreeNodeInterface node,TreeObjectInterface key);
-
-
 /** Inserts a key into the tree. 
   * @param key Key value to insert.                                           */
 public void insertKey(TreeObjectInterface key);

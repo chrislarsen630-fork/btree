@@ -22,12 +22,17 @@ public BTreeNodeInterface loadFromFile(String sourceFile);
 
 
 /** Loads the node at the specified index from disk.
-  * @param key Key of the node to read.
+  * @param nodeID ID of the node to read.
   * @return BTree node.                                                       */
-public BTreeNodeInterface readNode(TreeObjectInterface key);
+public BTreeNodeInterface readNode(long nodeID);
 
 
-/** Saves a node at the specified index to disk.
+/** Allocates space for a new BTree node and returns its ID number.
+  * @return ID of the newly allocated node.                                   */
+public long allocateNode();
+
+
+/** Saves a node to disk.
  * @param node Node to write.                                                 */
 public void writeNode(BTreeNodeInterface node);
 
