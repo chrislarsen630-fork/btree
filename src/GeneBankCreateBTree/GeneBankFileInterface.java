@@ -25,10 +25,10 @@ public boolean hasMoreSubsequences();
 
 /** Reads the data at the file parser and packs it into a binary
   * representation. Each two bits represents a DNA base (0b00=A, 0b01=C,
-  * 0b10=T, 0b11=G). The number of DNA bases read is determined by the
+  * 0b10=G, 0b11=T). The number of DNA bases read is determined by the
   * windowSize set in loadFromFile(). The bases are packed so that the base
   * that was read last is contained in the two least significant bits; for
-  * instance, the sequence ACTG is represented as 0b00011011.
+  * instance, the sequence ACGT is represented as 0b00011011.
   * @return Packed binary representation of data.                             */
 public long readData();
 
