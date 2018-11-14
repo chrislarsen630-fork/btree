@@ -1,7 +1,6 @@
-import Common.*;
+package Common;
+
 import Common.Impl.*;
-import Search.*;
-import Search.Impl.*;
 
 /** Class-to-interface allocator (Common). Creates a new instance of a class
   * which does the best job of implementing the desired interface. This allows
@@ -9,7 +8,7 @@ import Search.Impl.*;
   * allocator supplies a do-nothing stub class. Later on when the class is
   * implemented, all that needs to be changed is a single line of code here
   * to return the proper implementation,                                      */
-public class Allocate{
+public class AllocateC{
 
 
 
@@ -19,9 +18,6 @@ public static BTreeFileInterface  new_BTreeFile (){return new BTreeFile_Stub ();
 public static BTreeInterface      new_BTree     (){return new BTree_Stub     ();}
 public static BTreeNodeInterface  new_BTreeNode (){return new BTreeNode_Stub ();}
 public static TreeObjectInterface new_TreeObject(){return new TreeObject_Stub();}
-
-// Search
-public static QueryFileReaderInterface new_QueryFileReader(){return new QueryFileReader_Stub();}
 
 
 
