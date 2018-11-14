@@ -1,3 +1,7 @@
+package CreateBTree;
+
+import Common.*;
+
 /** GeneBank file interface. Parses a GeneBank file and converts the DNA
   * sequences contained therein into a packed binary format.                  */
 public interface GeneBankFileInterface{
@@ -9,7 +13,7 @@ public interface GeneBankFileInterface{
   * @param file GeneBank file to load.                                        
   * @param windowSize Number of DNA bases to load during readData().
   * @throws Common.OmniException on file access or read error.                */
-public void loadFromFile(String file,int windowSize) throws Common.OmniException;
+public void loadFromFile(String file,int windowSize) throws OmniException;
 
 
 /** Indicates whether the file parser is at the end of the current DNA
@@ -32,12 +36,12 @@ public boolean hasMoreSubsequences();
   * instance, the sequence ACGT is represented as 0b00011011.
   * @return Packed binary representation of data.
   * @throws Common.OmniException on file access or read error.                */
-public long readData() throws Common.OmniException;
+public long readData() throws OmniException;
 
 
 /** Sets the file parser to the beginning of the next DNA subsequence.
   * @throws Common.OmniException if there are no more subsequences.           */
-public void nextSubsequence() throws Common.OmniException;
+public void nextSubsequence() throws OmniException;
 
 
 
