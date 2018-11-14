@@ -31,8 +31,9 @@ public void setBTreeCacheInterface(BTreeCacheInterface target);
   * should not perform disk I/O itself; it should use the BTreeFileInterface
   * specified by setBTreeFileInterface().
   * @param targetFile File path for the created file. If the file exists,
-  *                   it will be overwritten.                                 */
-public void createNewFile(String targetFile);
+  *                   it will be overwritten.
+  * @throws OmniException on file creation error.                             */
+public void createNewFile(String targetFile) throws OmniException;
 
 
 /** Associates BTree with an existing file and loads the root node to memory.
@@ -41,8 +42,9 @@ public void createNewFile(String targetFile);
   * search() causes the object to load nodes from file as it traverses the
   * tree. The object should not perform disk I/O itself; it should use the
   * BTreeFileInterface specified by setBTreeFileInterface().
-  * @param sourceFile File path to load the BTree from.                       */
-public void loadFromFile(String sourceFile);
+  * @param sourceFile File path to load the BTree from.
+  * @throws OmniException on file access error.                               */
+public void loadFromFile(String sourceFile) throws OmniException;
 
 
 /** Searches for a key from the root node. Returns the node containing the

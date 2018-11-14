@@ -1,3 +1,5 @@
+package Search;
+
 /** Interface for reading the query file. */
 public interface QueryFileReaderInterface {
 
