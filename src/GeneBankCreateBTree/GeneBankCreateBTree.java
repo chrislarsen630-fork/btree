@@ -7,6 +7,11 @@ public class GeneBankCreateBTree{
 
 
 
+private final boolean DEBUG_NO_PARSE_ARGS              = true;
+private final boolean DEBUG_TEST_GENEBANKFILE          = true;
+private final String  DEBUG_TEST_GENEBANKFILE_FILENAME = "test3.gbk";
+
+
 /** Program entry point. Creates an instance of the GeneBankCreateBTree class
   * and executes it. Acts as a safety net for any unhandled exceptions thrown
   * elsewhere within the program. Do not add any code to this -- it goes in
@@ -16,6 +21,7 @@ public static void main(String[] args){
   try{
     (new GeneBankCreateBTree()).execute(args);
   }catch(Throwable e){
+    System.out.println();
     System.out.println("==FATAL ERROR==");
     if(e.getMessage()!=null){
       System.out.println("Error message: \""+e.getMessage()+"\"");
@@ -27,10 +33,28 @@ public static void main(String[] args){
 /** Instance entry point. Carries out the intended purpose of the program.
   * @param args Command-line arguments                                        */
 private void execute(String[] args){
-  if(!parseArguments(args)){
-    displayUsage();
-    return;
+  if(!DEBUG_NO_PARSE_ARGS){
+    if(!parseArguments(args)){
+      displayUsage();
+      return;
+    }
   }
+  
+  if(DEBUG_TEST_GENEBANKFILE){
+  GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
+    try{
+      geneFile.loadFromFile(DEBUG_TEST_GENEBANKFILE_FILENAME,1);
+      do{
+        for(int i=0;!geneFile.isSubsequenceDone();i++){
+          if(i%60==0&&i>0)System.out.println();
+          System.out.print(geneFile.readData()+" ");
+        }
+        System.out.println();
+        System.out.println();
+      }while(geneFile.nextSubsequence());
+    }catch(Exception e){throw new RuntimeException(e.getMessage());}
+  }
+
   
   // TODO: implement program functionality
 }

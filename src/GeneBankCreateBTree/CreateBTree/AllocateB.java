@@ -14,7 +14,7 @@ public class AllocateB{
 
 // CreateBTree
 public static DebugFileDumpInterface new_DebugFileDump(){return new DebugFileDump_Stub();}
-public static GeneBankFileInterface  new_GeneBankFile (){return new GeneBankFile_Stub ();}
+public static GeneBankFileInterface  new_GeneBankFile (){return new GeneBankFile_CML  ();}
 
 
 
