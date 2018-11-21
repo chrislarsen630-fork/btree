@@ -12,11 +12,9 @@ public class GeneBankFile_Stub implements GeneBankFileInterface{
 
 @Override public boolean isSubsequenceDone(){return false;}
 
-@Override public boolean hasMoreSubsequences(){return false;}
-
 @Override public long readData() throws OmniException{return 0;}
 
-@Override public void nextSubsequence() throws OmniException{}
+@Override public boolean nextSubsequence() throws OmniException{return false;}
 
 
 

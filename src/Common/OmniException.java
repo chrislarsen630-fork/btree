@@ -9,23 +9,26 @@ public enum ReasonCode{
   UNSPECIFIED      ,
   DEBUG            ,
   // BAD_PARAM     , // throw a RuntimeException instead
+  FILE_UNSPECIFIED ,
   FILE_ACCESS      ,
   FILE_READ_ERROR  ,
   FILE_WRITE_ERROR ,
   OTHER
 };
 /** Reason code -- no reason given. */
-private static final ReasonCode UNSPECIFIED      = ReasonCode.UNSPECIFIED;
+public static final ReasonCode UNSPECIFIED      = ReasonCode.UNSPECIFIED;
 /** Reason code -- debugging exception. */
-private static final ReasonCode DEBUG            = ReasonCode.DEBUG;
+public static final ReasonCode DEBUG            = ReasonCode.DEBUG;
+/** Reason code -- unspecified file issue. */
+public static final ReasonCode FILE_UNSPECIFIED = ReasonCode.FILE_UNSPECIFIED;
 /** Reason code -- file not found / cannot be opened. */
-private static final ReasonCode FILE_ACCESS      = ReasonCode.FILE_ACCESS;
+public static final ReasonCode FILE_ACCESS      = ReasonCode.FILE_ACCESS;
 /** Reason code -- file read error / malformed / unexpected end-of-file. */
-private static final ReasonCode FILE_READ_ERROR  = ReasonCode.FILE_READ_ERROR;
+public static final ReasonCode FILE_READ_ERROR  = ReasonCode.FILE_READ_ERROR;
 /** Reason code -- file write error. */
-private static final ReasonCode FILE_WRITE_ERROR = ReasonCode.FILE_WRITE_ERROR;
+public static final ReasonCode FILE_WRITE_ERROR = ReasonCode.FILE_WRITE_ERROR;
 /** Reason code -- other category. */
-private static final ReasonCode OTHER            = ReasonCode.OTHER;
+public static final ReasonCode OTHER            = ReasonCode.OTHER;
 
 
 private ReasonCode reason = ReasonCode.UNSPECIFIED;

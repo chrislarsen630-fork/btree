@@ -22,12 +22,6 @@ public void loadFromFile(String file,int windowSize) throws OmniException;
 public boolean isSubsequenceDone();
 
 
-/** Indicates whether there are more DNA subsequences in this file.
-  * Generally should be called after isSubsequenceDone() returns true.
-  * @return True if there are more DNA subsequences in the file.              */
-public boolean hasMoreSubsequences();
-
-
 /** Reads the data at the file parser and packs it into a binary
   * representation. Each two bits represents a DNA base (0b00=A, 0b01=C,
   * 0b10=G, 0b11=T). The number of DNA bases read is determined by the
@@ -40,8 +34,10 @@ public long readData() throws OmniException;
 
 
 /** Sets the file parser to the beginning of the next DNA subsequence.
+  * Returns true if the next subsequence exists, otherwise returns false.
+  * @return Whether a new subsequence has been loaded.
   * @throws Common.OmniException if there are no more subsequences.           */
-public void nextSubsequence() throws OmniException;
+public boolean nextSubsequence() throws OmniException;
 
 
 
