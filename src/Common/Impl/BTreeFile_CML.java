@@ -204,4 +204,4 @@ private void readHeader() throws OmniException{
 
 
 
-} // class BTreeFile_Stub
+} // class BTreeFile_CML

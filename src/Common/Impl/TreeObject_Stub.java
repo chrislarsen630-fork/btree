@@ -2,7 +2,7 @@ package Common.Impl;
 
 import Common.*;
 
-/** Stub implementation of TreeObject. */
+/** Stub implementation of TreeObject.                                        */
 public class TreeObject_Stub implements TreeObjectInterface{
 
 
@@ -15,7 +15,7 @@ public class TreeObject_Stub implements TreeObjectInterface{
 
 @Override public void incrementFrequency(){}
 
-@Override public int compareTo(Object t){return 0;}
+@Override public int compareTo(TreeObjectInterface obj){return 0;}
 
 
 

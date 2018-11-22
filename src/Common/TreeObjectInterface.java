@@ -1,7 +1,7 @@
 package Common;
 
 /** BTree object class. Data packet contained within a node.                  */
-public interface TreeObjectInterface extends Comparable{
+public interface TreeObjectInterface extends Comparable<TreeObjectInterface>{
 
 
 
