@@ -43,5 +43,10 @@ public long allocateNode() throws OmniException;
 public void writeNode(BTreeNodeInterface node) throws OmniException;
 
 
+/** Sets the ID of the root node.
+  * @param nodeID ID of the root node.                                        */
+public void setRootNode(long nodeID);
+
+
 
 } // interface BTreeFileInterface

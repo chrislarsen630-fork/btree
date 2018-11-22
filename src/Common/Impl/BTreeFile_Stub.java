@@ -17,6 +17,8 @@ public class BTreeFile_Stub implements BTreeFileInterface{
 
 @Override public void writeNode(BTreeNodeInterface node) throws OmniException{}
 
+@Override public void setRootNode(long nodeID){}
+
 
 
 } // class BTreeFile_Stub

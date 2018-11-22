@@ -26,9 +26,8 @@ private long rootID        = 0;
 
 
 // createNewFile() =============================================================
-@Override public BTreeNodeInterface createNewFile(
-  String targetFile,int degree
-)throws OmniException{
+@Override public BTreeNodeInterface createNewFile(String targetFile,int degree)
+throws OmniException{
   btreeDegree = degree;
 
   // create file  
@@ -43,7 +42,7 @@ private long rootID        = 0;
   dummyNode.setDegree(degree);
   dummyNode.inflateToMaximumSize();
   nodeSize = dummyNode.convertToBinaryBlob().length;
-  
+
   // write header padding and data
   try{
     byte[] headerPadding = new byte[headerSize];
@@ -62,24 +61,26 @@ private long rootID        = 0;
 
 // loadFromFile() ==============================================================
 @Override public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException{
-  // read file  
   try{
     filePtr = new RandomAccessFile(sourceFile,"rwd");
+    readHeader();
+    return readNode(rootID);
   }catch(IOException e){
     throw new OmniException(OmniException.FILE_ACCESS,"Issue creating BTree file.");
   }
-  
-  readHeader();
-  return readNode(rootID);
 }
 // loadFromFile() ==============================================================
 
 
 // readNode() ==================================================================
 @Override public BTreeNodeInterface readNode(long nodeID) throws OmniException{
+  if( (nodeID<1) || (nodeID>nodeCount) ){
+    throw new RuntimeException("Invalid node ID in BTree read.");
+  }
+
   try{
     byte[] blob = new byte[nodeSize];
-    filePtr.seek(headerSize + (nodeID * nodeSize));
+    filePtr.seek(headerSize + ((nodeID-1) * nodeSize));
     filePtr.read(blob);
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
     node.convertFromBinaryBlob(blob);
@@ -96,32 +97,42 @@ private long rootID        = 0;
 // allocateNode() ==============================================================
 @Override public long allocateNode() throws OmniException{
   try{
-    byte[] nodePadding = new byte[nodeSize];
+    // calculate file position
+    int pos = headerSize + (nodeCount * nodeSize);
+
+    // write padding
+    filePtr.seek(pos);
+    filePtr.write(new byte[nodeSize]);
+
+    // write node
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
-    node.setID    (nodeCount  );
+    node.setID    (nodeCount+1);
     node.setDegree(btreeDegree);
-    filePtr.seek(headerSize + (nodeCount * nodeSize));
-    filePtr.write(nodePadding);
-    filePtr.seek(headerSize + (nodeCount * nodeSize));
+    filePtr.seek(pos);
     filePtr.write(node.convertToBinaryBlob());
+
   }catch(IOException e){
     throw new OmniException(
       OmniException.FILE_WRITE_ERROR,"Unable to create node in BTree file."
     );
   }
 
-  long ret = nodeCount;
   nodeCount++;
   writeHeader();
-  return ret;
+  return nodeCount;
 }
 // allocateNode() ==============================================================
 
 
 // writeNode() =================================================================
 @Override public void writeNode(BTreeNodeInterface node) throws OmniException{
+  long id = node.getID();
+  if( (id<1) || (id>nodeCount) ){
+    throw new RuntimeException("Invalid node ID in BTree write.");
+  }
+  
   try{
-    filePtr.seek(headerSize + (node.getID() * nodeSize));
+    filePtr.seek(headerSize + ((node.getID()-1) * nodeSize));
     filePtr.write(node.convertToBinaryBlob());
   }catch(IOException e){
     throw new OmniException(
@@ -182,5 +193,15 @@ private void readHeader() throws OmniException{
 // readHeader() ================================================================
 
 
+// setRootNode() ===============================================================
+@Override public void setRootNode(long nodeID){
+  if( (nodeID<1) || (nodeID>nodeCount) ){
+    throw new RuntimeException("Invalid node ID set for BTree root node.");
+  }
+  rootID = nodeID;
+}
+// setRootNode() ===============================================================
 
-} // class BTreeFile_Stub
+
+
+} // class BTreeFile_CML
