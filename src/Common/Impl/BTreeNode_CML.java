@@ -3,7 +3,7 @@ package Common.Impl;
 import Common.*;
 import java.util.*;
 
-/** Stub implementation of BTreeNode. */
+/** Chris's implementation of BTreeNode. */
 public class BTreeNode_CML implements BTreeNodeInterface{
 
 
