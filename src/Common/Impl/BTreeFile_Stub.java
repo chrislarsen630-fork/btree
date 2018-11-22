@@ -7,7 +7,7 @@ public class BTreeFile_Stub implements BTreeFileInterface{
 
 
 
-@Override public BTreeNodeInterface createNewFile(String targetFile) throws OmniException{return null;}
+@Override public BTreeNodeInterface createNewFile(String targetFile,int degree) throws OmniException{return null;}
 
 @Override public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException{return null;}
 

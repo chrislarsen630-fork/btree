@@ -32,8 +32,9 @@ public void setBTreeCacheInterface(BTreeCacheInterface target);
   * specified by setBTreeFileInterface().
   * @param targetFile File path for the created file. If the file exists,
   *                   it will be overwritten.
+  * @param degree Degree of the BTree.
   * @throws OmniException on file creation error.                             */
-public void createNewFile(String targetFile) throws OmniException;
+public void createNewFile(String targetFile,int degree) throws OmniException;
 
 
 /** Associates BTree with an existing file and loads the root node to memory.

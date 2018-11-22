@@ -9,10 +9,11 @@ public interface BTreeFileInterface{
 
 /** Creates a new BTree file. Called by BTreeInterface.createNewFile().
   * @param targetFile File path for the created file. If the file exists,
-  *                   it will be overwritten.                                 
+  *                   it will be overwritten.
+  * @param degree Degree of the BTree.
   * @return Root node of the BTree.
   * @throws OmniException on file creation error.                             */
-public BTreeNodeInterface createNewFile(String targetFile) throws OmniException;
+public BTreeNodeInterface createNewFile(String targetFile,int degree) throws OmniException;
 
 
 /** Loads an existing BTree file from disk. Called by
@@ -23,7 +24,7 @@ public BTreeNodeInterface createNewFile(String targetFile) throws OmniException;
 public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException;
 
 
-/** Loads the node at the specified index from disk.
+/** Loads the node with the specified ID from disk.
   * @param nodeID ID of the node to read.
   * @return BTree node.
   * @throws OmniException if node does not exist or on read error.            */
