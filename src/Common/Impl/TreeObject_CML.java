@@ -59,8 +59,8 @@ private int  frequency = 1;
 @Override public void convertFromBinaryBlob(byte[] blob){
   data      = 0;
   frequency = 0;
-  for(int i=0;i<8;i++)data |= ((long)blob[  i])<<(i*8);
-  for(int i=0;i<4;i++)data |= ((int )blob[i+8])<<(i*8);
+  for(int i=0;i<8;i++)data      |= ((long)blob[  i])<<(i*8);
+  for(int i=0;i<4;i++)frequency |= ((int )blob[i+8])<<(i*8);
 }
 // convertFromBinaryBlob() =====================================================
 

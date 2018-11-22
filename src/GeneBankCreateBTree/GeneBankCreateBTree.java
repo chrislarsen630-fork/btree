@@ -7,9 +7,10 @@ public class GeneBankCreateBTree{
 
 
 
-private final boolean DEBUG_NO_PARSE_ARGS              = true;
-private final boolean DEBUG_TEST_GENEBANKFILE          = true;
-private final String  DEBUG_TEST_GENEBANKFILE_FILENAME = "test3.gbk";
+private final boolean DEBUG_DEBUGTESTS                       = true;
+private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = true;
+private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
+private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = true;
 
 
 /** Program entry point. Creates an instance of the GeneBankCreateBTree class
@@ -33,28 +34,15 @@ public static void main(String[] args){
 /** Instance entry point. Carries out the intended purpose of the program.
   * @param args Command-line arguments                                        */
 private void execute(String[] args){
-  if(!DEBUG_NO_PARSE_ARGS){
-    if(!parseArguments(args)){
-      displayUsage();
-      return;
-    }
+  if(DEBUG_DEBUGTESTS){
+    doDebugTests();
+    return;
   }
-  
-  if(DEBUG_TEST_GENEBANKFILE){
-  GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
-    try{
-      geneFile.loadFromFile(DEBUG_TEST_GENEBANKFILE_FILENAME,1);
-      do{
-        for(int i=0;!geneFile.isSubsequenceDone();i++){
-          if(i%60==0&&i>0)System.out.println();
-          System.out.print(geneFile.readData()+" ");
-        }
-        System.out.println();
-        System.out.println();
-      }while(geneFile.nextSubsequence());
-    }catch(Exception e){throw new RuntimeException(e.getMessage());}
+    
+  if(!parseArguments(args)){
+    displayUsage();
+    return;
   }
-
   
   // TODO: implement program functionality
 }
@@ -87,6 +75,43 @@ private boolean parseArguments(String[] args){
   // TODO: implement argument parser
   
   return false;
+}
+
+
+private void doDebugTests(){
+  if(DEBUG_DEBUGTESTS_GENEBANKFILE){
+    System.out.println("GENEBANKFILE_________________________________________");
+    GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
+    try{
+      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,1);
+      do{
+        for(int i=0;!geneFile.isSubsequenceDone();i++){
+          if(i%60==0&&i>0)System.out.println();
+          System.out.print(geneFile.readData()+" ");
+        }
+        System.out.println();
+        System.out.println();
+      }while(geneFile.nextSubsequence());
+    }catch(Exception e){throw new RuntimeException(e.getMessage());}
+  }
+
+  if(DEBUG_DEBUGTESTS_TREEOBJECT){
+    System.out.println("TREEOBJECT___________________________________________");
+    TreeObjectInterface obj = AllocateC.new_TreeObject();
+    obj.setData(0x12345678);
+    byte[] blob = obj.convertToBinaryBlob();
+    for(int i=0;i<blob.length;i++)System.out.print(String.format("0x%02X ",blob[i]));
+    System.out.println();
+    
+    TreeObjectInterface obj2 = AllocateC.new_TreeObject();
+    obj2.convertFromBinaryBlob(blob);
+    System.out.println(String.format("0x%08X",obj2.getData()));
+    System.out.println(obj2.getFrequency());
+    
+    System.out.println();
+    System.out.println();
+  }
+  
 }
 
 
