@@ -112,6 +112,7 @@ private long rootID        = 0;
 
   long ret = nodeCount;
   nodeCount++;
+  writeHeader();
   return ret;
 }
 // allocateNode() ==============================================================
