@@ -8,6 +8,8 @@ public class BTreeNode_Stub implements BTreeNodeInterface{
 
 
 
+@Override public void setDegree(int degree){}
+
 @Override public long getID(){return 0;}
 
 @Override public void setID(long id){}
@@ -19,6 +21,12 @@ public class BTreeNode_Stub implements BTreeNodeInterface{
 @Override public List<Long> getChildrenIDs(){return null;}
 
 @Override public int compareTo(Object t){return 0;}
+
+@Override public byte[] convertToBinaryBlob(){return null;}
+
+@Override public void convertFromBinaryBlob(byte[] blob){}
+
+@Override public void inflateToMaximumSize(){}
 
 
 
