@@ -11,11 +11,15 @@ public class TreeObject_Stub implements TreeObjectInterface{
 
 @Override public void setData(long value){}
 
-@Override public long getFrequency(){return 0;}
+@Override public int getFrequency(){return 0;}
 
 @Override public void incrementFrequency(){}
 
 @Override public int compareTo(TreeObjectInterface obj){return 0;}
+
+@Override public byte[] convertToBinaryBlob(){return null;}
+
+@Override public void convertFromBinaryBlob(byte[] blob){}
 
 
 
