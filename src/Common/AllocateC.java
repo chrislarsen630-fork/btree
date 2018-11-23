@@ -16,7 +16,7 @@ public class AllocateC{
 public static BTreeCacheInterface new_BTreeCache(){return new BTreeCache_Stub();}
 public static BTreeFileInterface  new_BTreeFile (){return new BTreeFile_CML  ();}
 public static BTreeInterface      new_BTree     (){return new BTree_Stub     ();}
-public static BTreeNodeInterface  new_BTreeNode (){return new BTreeNode_Stub ();}
+public static BTreeNodeInterface  new_BTreeNode (){return new BTreeNode_CML  ();}
 public static TreeObjectInterface new_TreeObject(){return new TreeObject_CML ();}
 
 

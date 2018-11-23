@@ -9,7 +9,7 @@ public class TreeObject_CML implements TreeObjectInterface{
 
 // STATE DATA ==================================================================
 private long data;
-private int  frequency = 1;
+private int  frequency = 0;
 // STATE DATA ==================================================================
 
 
@@ -19,7 +19,10 @@ private int  frequency = 1;
 
 
 // setData() ===================================================================
-@Override public void setData(long value){data = value;}
+@Override public void setData(long value){
+  data = value;
+  frequency = 1;
+}
 // setData() ===================================================================
 
 
@@ -59,8 +62,18 @@ private int  frequency = 1;
 @Override public void convertFromBinaryBlob(byte[] blob){
   data      = 0;
   frequency = 0;
-  for(int i=0;i<8;i++)data      |= ((long)blob[  i])<<(i*8);
-  for(int i=0;i<4;i++)frequency |= ((int )blob[i+8])<<(i*8);
+
+  for(int i=0;i<8;i++){
+    long v   = blob[i];
+    if(v<0)v = 256+v;
+    data    |= v<<(i*8);
+  }
+
+  for(int i=0;i<4;i++){
+    int v      = blob[i+8];
+    if(v<0)v   = 256+v;
+    frequency |= v<<(i*8);
+  }
 }
 // convertFromBinaryBlob() =====================================================
 

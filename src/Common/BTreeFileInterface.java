@@ -28,13 +28,13 @@ public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException;
   * @param nodeID ID of the node to read.
   * @return BTree node.
   * @throws OmniException if node does not exist or on read error.            */
-public BTreeNodeInterface readNode(long nodeID) throws OmniException;
+public BTreeNodeInterface readNode(int nodeID) throws OmniException;
 
 
 /** Allocates space for a new BTree node and returns its ID number.
   * @return ID of the newly allocated node.
   * @throws OmniException if a new node cannot be allocated.                  */
-public long allocateNode() throws OmniException;
+public int allocateNode() throws OmniException;
 
 
 /** Saves a node to disk.
@@ -45,7 +45,7 @@ public void writeNode(BTreeNodeInterface node) throws OmniException;
 
 /** Sets the ID of the root node.
   * @param nodeID ID of the root node.                                        */
-public void setRootNode(long nodeID);
+public void setRootNode(int nodeID);
 
 
 

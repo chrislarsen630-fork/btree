@@ -11,6 +11,7 @@ private final boolean DEBUG_DEBUGTESTS                       = true;
 private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = true;
 private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
 private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = true;
+private final boolean DEBUG_DEBUGTESTS_BTREENODE             = true;
 
 
 /** Program entry point. Creates an instance of the GeneBankCreateBTree class
@@ -112,6 +113,37 @@ private void doDebugTests(){
     System.out.println();
   }
   
+  if(DEBUG_DEBUGTESTS_BTREENODE){
+    System.out.println("BTREENODE____________________________________________");
+    BTreeNodeInterface node = AllocateC.new_BTreeNode();
+    node.setDegree(4);
+    node.setNKeys(4);
+    node.getKeyArray()[0].setData(11111111);
+    node.getKeyArray()[1].setData(22222222);
+    node.getKeyArray()[2].setData(33333333);
+    node.getChildrenIDArray()[0] = 44444444;
+    node.getChildrenIDArray()[1] = 55555555;
+    node.getChildrenIDArray()[2] = 66666666;
+    node.getChildrenIDArray()[3] = 77777777;
+    System.out.println(""+node.getNKeys());
+    for(int i=0;i<3;i++)System.out.print(""+node.getKeyArray()[i].getData()+" ");
+    System.out.println();
+    for(int i=0;i<4;i++)System.out.print(""+node.getChildrenIDArray()[i]+" ");
+    System.out.println();
+    System.out.println();
+  
+    byte[] blob = node.convertToBinaryBlob();
+
+    BTreeNodeInterface eckas = AllocateC.new_BTreeNode();
+    eckas.setDegree(4);
+    eckas.convertFromBinaryBlob(blob);
+    System.out.println(""+eckas.getNKeys());
+    for(int i=0;i<3;i++)System.out.print(""+eckas.getKeyArray()[i].getData()+" ");
+    System.out.println();
+    for(int i=0;i<4;i++)System.out.print(""+eckas.getChildrenIDArray()[i]+" ");
+    System.out.println();
+    System.out.println();
+  }
 }
 
 
