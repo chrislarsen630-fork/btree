@@ -9,7 +9,7 @@ public class BTreeFile_CML implements BTreeFileInterface{
 
 
 // CONSTANTS ===================================================================
-private static final int MAGIC_NUMBER   = 0xDEC0AD3B;
+private static final int MAGIC_NUMBER   = 0x3BADC0DE; // Java is big-endian
 private static final int FORMAT_VERSION = 0x20181121;
 // CONSTANTS ===================================================================
 
@@ -54,7 +54,10 @@ throws OmniException{
 
   // create root node
   rootID = allocateNode();
-  return readNode(rootID);
+  BTreeNodeInterface ret = readNode(rootID);
+  ret.setLeaf(true);
+  writeNode(ret);
+  return ret;
 }
 // createNewFile() =============================================================
 

@@ -8,10 +8,11 @@ public class GeneBankCreateBTree{
 
 
 private final boolean DEBUG_DEBUGTESTS                       = true;
-private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = true;
+private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = false;
 private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
-private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = true;
-private final boolean DEBUG_DEBUGTESTS_BTREENODE             = true;
+private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = false;
+private final boolean DEBUG_DEBUGTESTS_BTREENODE             = false;
+private final boolean DEBUG_DEBUGTESTS_BTREE                 = true;
 
 
 /** Program entry point. Creates an instance of the GeneBankCreateBTree class
@@ -143,6 +144,44 @@ private void doDebugTests(){
     for(int i=0;i<4;i++)System.out.print(""+eckas.getChildrenIDArray()[i]+" ");
     System.out.println();
     System.out.println();
+  }
+  
+  if(DEBUG_DEBUGTESTS_BTREE){
+    try{
+      BTreeInterface tree = AllocateC.new_BTree();
+      tree.setBTreeFileInterface(AllocateC.new_BTreeFile());
+      tree.createNewFile("TestFile.bin",2);
+      TreeObjectInterface key1 = AllocateC.new_TreeObject();
+      key1.setData(99);
+      tree.insertKey(key1);
+      TreeObjectInterface key2 = AllocateC.new_TreeObject();
+      key2.setData(88);
+      tree.insertKey(key2);
+      TreeObjectInterface key3 = AllocateC.new_TreeObject();
+      key3.setData(77);
+      tree.insertKey(key3);
+      TreeObjectInterface key4 = AllocateC.new_TreeObject();
+      key4.setData(66);
+      tree.insertKey(key4);
+      BTreeNodeInterface n = tree.searchKey(key1);
+      System.out.print(n.getID()+" : ");
+      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
+      System.out.println();
+      n = tree.searchKey(key2);
+      System.out.print(n.getID()+" : ");
+      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
+      System.out.println();
+      n = tree.searchKey(key3);
+      System.out.print(n.getID()+" : ");
+      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
+      System.out.println();
+      n = tree.searchKey(key4);
+      System.out.print(n.getID()+" : ");
+      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
+      System.out.println();
+    }catch(OmniException e){
+      System.out.println("THREW EXCEPTION");
+    }
   }
 }
 

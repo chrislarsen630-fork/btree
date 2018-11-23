@@ -52,12 +52,12 @@ public void loadFromFile(String sourceFile) throws OmniException;
   * key, or null if it is not found.
   * @param key Key value to search for.
   * @return Node containing the key, or null if not found.                    */
-public BTreeNodeInterface searchKey(TreeObjectInterface key);
+public BTreeNodeInterface searchKey(TreeObjectInterface key) throws OmniException;
 
 
 /** Inserts a key into the tree. 
   * @param key Key value to insert.                                           */
-public void insertKey(TreeObjectInterface key);
+public void insertKey(TreeObjectInterface key) throws OmniException;
 
 
 
