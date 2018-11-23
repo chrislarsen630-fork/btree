@@ -10,11 +10,21 @@ public class BTreeNode_Stub implements BTreeNodeInterface{
 
 @Override public void setDegree(int degree){}
 
-@Override public long getID(){return 0;}
+@Override public int getID(){return 0;}
 
-@Override public void setID(long id){}
+@Override public void setID(int id){}
 
 @Override public boolean isLeaf(){return false;}
+
+@Override public void setLeaf(boolean value){}
+
+@Override public int getNKeys(){return 0;}
+
+@Override public void setNKeys(int value){}
+
+@Override public TreeObjectInterface[] getKeyArray(){return null;}
+
+@Override public int[] getChildrenIDArray(){return null;}
 
 @Override public byte[] convertToBinaryBlob(){return null;}
 

@@ -6,11 +6,11 @@ public interface BTreeCacheInterface{
 
 
 
-/** Searches the cache for a node containing a key, if it exists. Returns the
+/** Searches the cache for a node, if it exists. Returns the
   * node if found, otherwise returns null.
   * @param nodeID ID of the node to search for.
   * @return Node containing the key, or null if not found.                    */
-public BTreeNodeInterface searchNode(long nodeID);
+public BTreeNodeInterface searchNode(int nodeID);
 
 
 /** Inserts a node into the cache.

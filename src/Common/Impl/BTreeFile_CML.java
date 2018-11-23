@@ -17,11 +17,11 @@ private static final int FORMAT_VERSION = 0x20181121;
 // STATE DATA ==================================================================
 private RandomAccessFile filePtr;
 
-private int  headerSize    = 4096;
-private int  nodeSize      = 0;
-private int  btreeDegree   = 0;
-private int  nodeCount     = 0;
-private long rootID        = 0;
+private int headerSize  = 4096;
+private int nodeSize    = 0;
+private int btreeDegree = 0;
+private int nodeCount   = 0;
+private int rootID      = 0;
 // STATE DATA ==================================================================
 
 
@@ -73,7 +73,7 @@ throws OmniException{
 
 
 // readNode() ==================================================================
-@Override public BTreeNodeInterface readNode(long nodeID) throws OmniException{
+@Override public BTreeNodeInterface readNode(int nodeID) throws OmniException{
   if( (nodeID<1) || (nodeID>nodeCount) ){
     throw new RuntimeException("Invalid node ID in BTree read.");
   }
@@ -83,6 +83,8 @@ throws OmniException{
     filePtr.seek(headerSize + ((nodeID-1) * nodeSize));
     filePtr.read(blob);
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
+    node.setDegree(btreeDegree);
+    node.setID(nodeID);
     node.convertFromBinaryBlob(blob);
     return node;
   }catch(IOException e){
@@ -95,7 +97,7 @@ throws OmniException{
 
 
 // allocateNode() ==============================================================
-@Override public long allocateNode() throws OmniException{
+@Override public int allocateNode() throws OmniException{
   try{
     // calculate file position
     int pos = headerSize + (nodeCount * nodeSize);
@@ -194,11 +196,12 @@ private void readHeader() throws OmniException{
 
 
 // setRootNode() ===============================================================
-@Override public void setRootNode(long nodeID){
+@Override public void setRootNode(int nodeID){
   if( (nodeID<1) || (nodeID>nodeCount) ){
     throw new RuntimeException("Invalid node ID set for BTree root node.");
   }
   rootID = nodeID;
+  try{writeHeader();}catch(OmniException e){}
 }
 // setRootNode() ===============================================================
 
