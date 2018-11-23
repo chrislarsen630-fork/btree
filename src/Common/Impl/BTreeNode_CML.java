@@ -95,7 +95,7 @@ int[]                 childrenIDArray;
   
   for(int j=0;j<maxChildren;j++){
     int childID = childrenIDArray[j];
-    for(int i=0;i<4;i++)blob[i+offset] = (byte)((childID>>(i*8)) & 0xFF);
+    for(int i=0;i<4;i++)blob[i+offset] = (byte)((childID>>((3-i)*8)) & 0xFF);
     offset += 4;
   }
   
@@ -127,7 +127,7 @@ int[]                 childrenIDArray;
     for(int i=0;i<4;i++){
       int v = blob[i+offset];
       if(v<0)v = 256+v;
-      childID |= v<<(i*8);
+      childID |= v<<((3-i)*8);
     }
     childrenIDArray[j] = childID;
     offset += 4;
