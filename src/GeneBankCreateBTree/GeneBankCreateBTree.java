@@ -104,11 +104,11 @@ private void execute(String[] args){
 
   System.out.print("Populating BTree. Standby.");
   try{
-    TreeObjectInterface key = AllocateC.new_TreeObject();
     do{
       for(int i=0;!geneFile.isSubsequenceDone();i++){
         if(i%300==0&&i>0)System.out.print(".");
         long data = geneFile.readData();
+        TreeObjectInterface key = AllocateC.new_TreeObject();
         key.setData(data);
         tree.insertKey(key);          
       }
