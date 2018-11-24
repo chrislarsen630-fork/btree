@@ -8,11 +8,13 @@ public class GeneBankCreateBTree{
 
 
 private final boolean DEBUG_DEBUGTESTS                       = true;
+private final int     DEBUG_DEBUGTESTS_BTREEDEGREE           = 2;
 private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = false;
 private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
 private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = false;
 private final boolean DEBUG_DEBUGTESTS_BTREENODE             = false;
-private final boolean DEBUG_DEBUGTESTS_BTREE                 = true;
+private final boolean DEBUG_DEBUGTESTS_BTREE                 = false;
+private final boolean DEBUG_DEBUGTESTS_GENEBANKFILEPLUSBTREE = true;
 
 
 /** Program entry point. Creates an instance of the GeneBankCreateBTree class
@@ -117,7 +119,7 @@ private void doDebugTests(){
   if(DEBUG_DEBUGTESTS_BTREENODE){
     System.out.println("BTREENODE____________________________________________");
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
-    node.setDegree(4);
+    node.setDegree(DEBUG_DEBUGTESTS_BTREEDEGREE);
     node.setNKeys(4);
     node.getKeyArray()[0].setData(11111111);
     node.getKeyArray()[1].setData(22222222);
@@ -136,7 +138,7 @@ private void doDebugTests(){
     byte[] blob = node.convertToBinaryBlob();
 
     BTreeNodeInterface eckas = AllocateC.new_BTreeNode();
-    eckas.setDegree(4);
+    eckas.setDegree(DEBUG_DEBUGTESTS_BTREEDEGREE);
     eckas.convertFromBinaryBlob(blob);
     System.out.println(""+eckas.getNKeys());
     for(int i=0;i<3;i++)System.out.print(""+eckas.getKeyArray()[i].getData()+" ");
@@ -149,7 +151,7 @@ private void doDebugTests(){
   if(DEBUG_DEBUGTESTS_BTREE){
     try{
       BTreeInterface tree = AllocateC.new_BTree();
-      tree.createNewFile("TestFile.bin",2);
+      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE);
       tree.setUseCache(true);
       char[] keyArray = {'a','j','i','b','c','h','g','d','e','f'};
       for(int i=0;i<keyArray.length;i++){
@@ -165,9 +167,30 @@ private void doDebugTests(){
         for(int j=0,jS=n.getNKeys();j<jS;j++)System.out.print(""+(char)n.getKeyArray()[j].getData()+" ");
         System.out.println(n.isLeaf()?" leaf":" nonleaf");
       }
-    }catch(OmniException e){
-      System.out.println("THREW EXCEPTION");
-    }
+    }catch(OmniException e){System.out.println("THREW EXCEPTION");}
+  }
+  
+  if(DEBUG_DEBUGTESTS_GENEBANKFILEPLUSBTREE){
+    try{
+      BTreeInterface tree = AllocateC.new_BTree();
+      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE);
+      tree.setUseCache(true);
+      
+      GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
+      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,1);
+      do{
+        for(int i=0;!geneFile.isSubsequenceDone();i++){
+          if(i%60==0&&i>0)System.out.println();
+          long data = geneFile.readData();
+          System.out.print(data+" ");
+          TreeObjectInterface key = AllocateC.new_TreeObject();
+          key.setData(data);
+          tree.insertKey(key);          
+        }
+        System.out.println();
+        System.out.println();
+      }while(geneFile.nextSubsequence());      
+    }catch(OmniException e){System.out.println("THREW EXCEPTION");}
   }
 }
 
