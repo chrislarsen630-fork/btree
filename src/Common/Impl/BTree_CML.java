@@ -106,11 +106,10 @@ private BTreeNodeInterface b_tree_search(BTreeNodeInterface x,TreeObjectInterfac
 
 
 // b_tree_split_child() ========================================================
-private void b_tree_split_child(BTreeNodeInterface x,int i) throws OmniException{
-  int t = btreeDegree;
+private void b_tree_split_child(BTreeNodeInterface x,int i,BTreeNodeInterface y) throws OmniException{
+  int t  = btreeDegree;
   int xN = x.getNKeys();
   BTreeNodeInterface z = fetchNode(btreeFile.allocateNode());
-  BTreeNodeInterface y = fetchNode(x.getChildrenIDArray()[i]);
   z.setLeaf(y.isLeaf());
   z.setNKeys(t-1);
   TreeObjectInterface[] xKey = x.getKeyArray();
@@ -124,9 +123,9 @@ private void b_tree_split_child(BTreeNodeInterface x,int i) throws OmniException
     for(int j=0;j<t;j++)zC[j] = yC[j+t];
   }
   y.setNKeys(t-1);
-  for(int j=xN;j>i+1;j--)xC[j+1] = xC[j];
+  for(int j=xN;j>=i+1;j--)xC[j+1] = xC[j];
   xC[i+1] = z.getID();
-  for(int j=xN-1;j>i;j--)xKey[j+1] = xKey[j];
+  for(int j=xN-1;j>=i;j--)xKey[j+1] = xKey[j];
   xKey[i] = yKey[t-1];
   x.setNKeys(xN+1);
   dispatchNode(y);
@@ -154,9 +153,10 @@ throws OmniException{
     i++;
     BTreeNodeInterface xCi = fetchNode(xC[i]);
     if(xCi.getNKeys()==2*t-1){
-      b_tree_split_child(x,i);
+      b_tree_split_child(x,i,xCi);
       if(k.compareTo(xKey[i])>0)i++;
     }
+    xCi = fetchNode(xC[i]);
     b_tree_insert_nonfull(xCi,k);
   }
 }
@@ -176,7 +176,7 @@ private void b_tree_insert(TreeObjectInterface k) throws OmniException{
     s.getChildrenIDArray()[0] = r.getID();
     dispatchNode(s);
     btreeFile.setRootNode(s.getID());
-    b_tree_split_child(s,0);
+    b_tree_split_child(s,0,r);
     b_tree_insert_nonfull(s,k);
   }else b_tree_insert_nonfull(r,k);
 }
