@@ -12,13 +12,16 @@ private BTreeFileInterface  btreeFile;
 private BTreeCacheInterface btreeCache;
 private BTreeNodeInterface  rootNode;
 private int     btreeDegree  = 0;
-private boolean useCacheFlag = false;
+private int     cacheEntries = 0;
 // STATE DATA ==================================================================
 
 
 
 // setUseCache() ===============================================================
-@Override public void setUseCache(boolean value){useCacheFlag = value;}
+@Override public void setCacheSize(int cacheSize){
+  cacheEntries = cacheSize;
+  if(btreeCache!=null)btreeCache.setCacheSize(cacheSize);
+}
 // setUseCache() ===============================================================
 
 
@@ -26,6 +29,7 @@ private boolean useCacheFlag = false;
 @Override public void createNewFile(String targetFile,int degree) throws OmniException{
   btreeFile  = AllocateC.new_BTreeFile();
   btreeCache = AllocateC.new_BTreeCache();
+  if(cacheEntries>0)btreeCache.setCacheSize(cacheEntries);
   
   btreeDegree = degree;
   rootNode = btreeFile.createNewFile(targetFile,degree);
@@ -39,6 +43,7 @@ private boolean useCacheFlag = false;
 @Override public void loadFromFile(String sourceFile) throws OmniException{
   btreeFile  = AllocateC.new_BTreeFile();
   btreeCache = AllocateC.new_BTreeCache();
+  if(cacheEntries>0)btreeCache.setCacheSize(cacheEntries);
 
   rootNode = btreeFile.loadFromFile(sourceFile);
 }
@@ -72,7 +77,7 @@ private boolean useCacheFlag = false;
 // fetchNode() =================================================================
 private BTreeNodeInterface fetchNode(int id) throws OmniException{
   if(id==rootNode.getID())return rootNode;
-  if(useCacheFlag){
+  if(cacheEntries>0){
     BTreeNodeInterface ret = btreeCache.searchNode(id);
     if(ret!=null)return ret;
   }
@@ -84,7 +89,7 @@ private BTreeNodeInterface fetchNode(int id) throws OmniException{
 // dispatchNode() ==============================================================
 private void dispatchNode(BTreeNodeInterface node) throws OmniException{
   if(node.getID()==rootNode.getID())rootNode = node; // make sure root is current
-  if(useCacheFlag)btreeCache.insertNode(node);
+  if(cacheEntries>0)btreeCache.insertNode(node);
   btreeFile.writeNode(node);
 }
 // dispatchNode() ==============================================================

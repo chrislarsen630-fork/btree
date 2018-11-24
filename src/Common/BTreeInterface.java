@@ -5,10 +5,11 @@ public interface BTreeInterface{
 
 
 
-/** Sets whether the BTree uses a cache or not. Using a cache will speed up
-  * node accesses, at the expense of increased memory usage.
-  * @param value true if a cache should be used, otherwise false.             */
-public void setUseCache(boolean value);
+/** Sets the size of the cache, or disables it if the size is set to 0. Using
+  * the cache will speed up node accesses at the cost of increased memory
+  * usage.
+  * @param cacheSize Size of the cache in entries, or 0 to disable.           */
+public void setCacheSize(int cacheSize);
 
 
 /** Creates a new BTree and associates it with a target file name. This does
