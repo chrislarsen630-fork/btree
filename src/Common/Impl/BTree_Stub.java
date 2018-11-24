@@ -7,9 +7,7 @@ public class BTree_Stub implements BTreeInterface{
 
 
 
-@Override public void setBTreeFileInterface(BTreeFileInterface target){}
-
-@Override public void setBTreeCacheInterface(BTreeCacheInterface target){}
+@Override public void setUseCache(boolean value){}
 
 @Override public void createNewFile(String targetFile,int degree)
 throws OmniException{}

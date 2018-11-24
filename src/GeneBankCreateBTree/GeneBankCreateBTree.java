@@ -149,8 +149,8 @@ private void doDebugTests(){
   if(DEBUG_DEBUGTESTS_BTREE){
     try{
       BTreeInterface tree = AllocateC.new_BTree();
-      tree.setBTreeFileInterface(AllocateC.new_BTreeFile());
       tree.createNewFile("TestFile.bin",2);
+      tree.setUseCache(true);
       TreeObjectInterface key1 = AllocateC.new_TreeObject();
       key1.setData(99);
       tree.insertKey(key1);
