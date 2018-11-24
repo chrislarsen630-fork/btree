@@ -151,34 +151,20 @@ private void doDebugTests(){
       BTreeInterface tree = AllocateC.new_BTree();
       tree.createNewFile("TestFile.bin",2);
       tree.setUseCache(true);
-      TreeObjectInterface key1 = AllocateC.new_TreeObject();
-      key1.setData(99);
-      tree.insertKey(key1);
-      TreeObjectInterface key2 = AllocateC.new_TreeObject();
-      key2.setData(88);
-      tree.insertKey(key2);
-      TreeObjectInterface key3 = AllocateC.new_TreeObject();
-      key3.setData(77);
-      tree.insertKey(key3);
-      TreeObjectInterface key4 = AllocateC.new_TreeObject();
-      key4.setData(66);
-      tree.insertKey(key4);
-      BTreeNodeInterface n = tree.searchKey(key1);
-      System.out.print(n.getID()+" : ");
-      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
-      System.out.println();
-      n = tree.searchKey(key2);
-      System.out.print(n.getID()+" : ");
-      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
-      System.out.println();
-      n = tree.searchKey(key3);
-      System.out.print(n.getID()+" : ");
-      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
-      System.out.println();
-      n = tree.searchKey(key4);
-      System.out.print(n.getID()+" : ");
-      for(int i=0,iS=n.getNKeys();i<iS;i++)System.out.print(""+n.getKeyArray()[i].getData()+" ");
-      System.out.println();
+      char[] keyArray = {'a','j','i','b','c','h','g','d','e','f'};
+      for(int i=0;i<keyArray.length;i++){
+        TreeObjectInterface key = AllocateC.new_TreeObject();
+        key.setData(keyArray[i]);
+        tree.insertKey(key);
+      }
+      for(int i=0;i<keyArray.length;i++){
+        TreeObjectInterface key = AllocateC.new_TreeObject();
+        key.setData(keyArray[i]);
+        BTreeNodeInterface n = tree.searchKey(key);
+        System.out.print(n.getID()+" : ");
+        for(int j=0,jS=n.getNKeys();j<jS;j++)System.out.print(""+(char)n.getKeyArray()[j].getData()+" ");
+        System.out.println(n.isLeaf()?" leaf":" nonleaf");
+      }
     }catch(OmniException e){
       System.out.println("THREW EXCEPTION");
     }
