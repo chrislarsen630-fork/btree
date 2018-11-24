@@ -14,7 +14,7 @@ int nodeID      = 0;
 int maxChildren = 0;
 int maxKeys     = 0;
 int nKeys       = 0;
-boolean               leafFlag = true;
+boolean               leafFlag;
 TreeObjectInterface[] keyArray;
 int[]                 childrenIDArray;
 // STATE DATA ==================================================================
@@ -79,7 +79,7 @@ int[]                 childrenIDArray;
 @Override public byte[] convertToBinaryBlob(){
   int keyBlobSize = AllocateC.new_TreeObject().convertToBinaryBlob().length;
   
-  byte[] blob = new byte[4 + maxKeys*keyBlobSize + maxChildren*4];
+  byte[] blob = new byte[4 + maxKeys*keyBlobSize + maxChildren*4 + 1];
   
   int offset = 0;
   
@@ -98,6 +98,8 @@ int[]                 childrenIDArray;
     for(int i=0;i<4;i++)blob[i+offset] = (byte)((childID>>((3-i)*8)) & 0xFF);
     offset += 4;
   }
+  
+  blob[offset] = (byte)(leafFlag ? 1 : 0);
   
   return blob;
 }
@@ -132,6 +134,8 @@ int[]                 childrenIDArray;
     childrenIDArray[j] = childID;
     offset += 4;
   }
+  
+  leafFlag = (blob[offset]==1);
 }
 // convertFromBinaryBlob() =====================================================
 
