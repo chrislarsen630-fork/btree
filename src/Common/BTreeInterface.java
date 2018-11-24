@@ -5,22 +5,10 @@ public interface BTreeInterface{
 
 
 
-/** Associates the BTree with a BTreeFileInterface object. The file interface
-  * is responsible for performing the heavy-lifting involved with file I/O;
-  * it creates new BTree files, loads and parses existing files, and loads
-  * and writes nodes to and from disk. The BTree object should not do any of
-  * these tasks on its own -- it should perform all disk I/O through the
-  * file interface.
-  * @param target BTreeFileInterface to associate with BTree.                 */
-public void setBTreeFileInterface(BTreeFileInterface target);
-
-
-/** Associates the BTree with a BTreeCacheInterface object. The BTree should
-  * query the cache to see if a node is in memory prior to reading the node
-  * from file. If no cache is desired, call this method with a stub
-  * implementation of the cache interface.
-  * @param target BTreeCacheInterface to associate with BTree.                */
-public void setBTreeCacheInterface(BTreeCacheInterface target);
+/** Sets whether the BTree uses a cache or not. Using a cache will speed up
+  * node accesses, at the expense of increased memory usage.
+  * @param value true if a cache should be used, otherwise false.             */
+public void setUseCache(boolean value);
 
 
 /** Creates a new BTree and associates it with a target file name. This does

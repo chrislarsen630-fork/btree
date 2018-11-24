@@ -11,36 +11,35 @@ public class BTree_CML implements BTreeInterface{
 private BTreeFileInterface  btreeFile;
 private BTreeCacheInterface btreeCache;
 private BTreeNodeInterface  rootNode;
-private int btreeDegree = 0;
+private int     btreeDegree  = 0;
+private boolean useCacheFlag = false;
 // STATE DATA ==================================================================
 
 
-// setBTreeFileInterface() =====================================================
-@Override public void setBTreeFileInterface(BTreeFileInterface target){
-  btreeFile = target;
-}
-// setBTreeFileInterface() =====================================================
 
-
-// setBTreeCacheInterface() ====================================================
-@Override public void setBTreeCacheInterface(BTreeCacheInterface target){
-  btreeCache = target;
-}
-// setBTreeCacheInterface() ====================================================
+// setUseCache() ===============================================================
+@Override public void setUseCache(boolean value){useCacheFlag = value;}
+// setUseCache() ===============================================================
 
 
 // createNewFile() =============================================================
 @Override public void createNewFile(String targetFile,int degree) throws OmniException{
+  btreeFile  = AllocateC.new_BTreeFile();
+  btreeCache = AllocateC.new_BTreeCache();
+  
   btreeDegree = degree;
   rootNode = btreeFile.createNewFile(targetFile,degree);
   rootNode.setLeaf(true);
-  btreeFile.writeNode(rootNode);
+  dispatchNode(rootNode);
 }
 // createNewFile() =============================================================
 
 
 // loadFromFile() ==============================================================
 @Override public void loadFromFile(String sourceFile) throws OmniException{
+  btreeFile  = AllocateC.new_BTreeFile();
+  btreeCache = AllocateC.new_BTreeCache();
+
   rootNode = btreeFile.loadFromFile(sourceFile);
 }
 // loadFromFile() ==============================================================
@@ -64,10 +63,31 @@ private int btreeDegree = 0;
       if(nodeKeys[i].compareTo(key)==0)break;
     }
     nodeKeys[i].incrementFrequency();
-    btreeFile.writeNode(node);
+    dispatchNode(node);
   }else b_tree_insert(key);
 }
 // insertKey() =================================================================
+
+
+// fetchNode() =================================================================
+private BTreeNodeInterface fetchNode(int id) throws OmniException{
+  if(id==rootNode.getID())return rootNode;
+  if(useCacheFlag){
+    BTreeNodeInterface ret = btreeCache.searchNode(id);
+    if(ret!=null)return ret;
+  }
+  return btreeFile.readNode(id);
+}
+// fetchNode() =================================================================
+
+
+// dispatchNode() ==============================================================
+private void dispatchNode(BTreeNodeInterface node) throws OmniException{
+  if(node.getID()==rootNode.getID())rootNode = node; // make sure root is current
+  if(useCacheFlag)btreeCache.insertNode(node);
+  btreeFile.writeNode(node);
+}
+// dispatchNode() ==============================================================
 
 
 // b_tree_search() =============================================================
@@ -80,7 +100,7 @@ private BTreeNodeInterface b_tree_search(BTreeNodeInterface x,TreeObjectInterfac
   if(x.isLeaf())return null;
   int xCID = x.getChildrenIDArray()[i];
   if(xCID<1)return null;
-  return b_tree_search(btreeFile.readNode(xCID),k);
+  return b_tree_search(fetchNode(xCID),k);
 }
 // b_tree_search() =============================================================
 
@@ -89,8 +109,8 @@ private BTreeNodeInterface b_tree_search(BTreeNodeInterface x,TreeObjectInterfac
 private void b_tree_split_child(BTreeNodeInterface x,int i) throws OmniException{
   int t = btreeDegree;
   int xN = x.getNKeys();
-  BTreeNodeInterface z = btreeFile.readNode(btreeFile.allocateNode());
-  BTreeNodeInterface y = btreeFile.readNode(x.getChildrenIDArray()[i]);
+  BTreeNodeInterface z = fetchNode(btreeFile.allocateNode());
+  BTreeNodeInterface y = fetchNode(x.getChildrenIDArray()[i]);
   z.setLeaf(y.isLeaf());
   z.setNKeys(t-1);
   TreeObjectInterface[] xKey = x.getKeyArray();
@@ -109,9 +129,9 @@ private void b_tree_split_child(BTreeNodeInterface x,int i) throws OmniException
   for(int j=xN-1;j>i;j--)xKey[j+1] = xKey[j];
   xKey[i] = yKey[t-1];
   x.setNKeys(xN+1);
-  btreeFile.writeNode(y);
-  btreeFile.writeNode(z);
-  btreeFile.writeNode(x);
+  dispatchNode(y);
+  dispatchNode(z);
+  dispatchNode(x);
 }
 // b_tree_split_child() ========================================================
 
@@ -128,17 +148,15 @@ throws OmniException{
     for(;(i>=0)&&(k.compareTo(xKey[i])<0);i--)xKey[i+1] = xKey[i];
     xKey[i+1] = k;
     x.setNKeys(xN+1);
-    btreeFile.writeNode(x);
+    dispatchNode(x);
   }else{
     for(;(i>=0)&&(k.compareTo(xKey[i])<0);i--){}
     i++;
-    BTreeNodeInterface xCi = btreeFile.readNode(xC[i]);
+    BTreeNodeInterface xCi = fetchNode(xC[i]);
     if(xCi.getNKeys()==2*t-1){
       b_tree_split_child(x,i);
-      x = btreeFile.readNode(x.getID());
       if(k.compareTo(xKey[i])>0)i++;
     }
-    xCi = btreeFile.readNode(xC[i]);
     b_tree_insert_nonfull(xCi,k);
   }
 }
@@ -151,12 +169,12 @@ private void b_tree_insert(TreeObjectInterface k) throws OmniException{
   BTreeNodeInterface r = rootNode;
   int rN = r.getNKeys();
   if(rN==2*t-1){
-    BTreeNodeInterface s = btreeFile.readNode(btreeFile.allocateNode());
+    BTreeNodeInterface s = fetchNode(btreeFile.allocateNode());
     rootNode = s;
     s.setLeaf(false);
     s.setNKeys(0);
     s.getChildrenIDArray()[0] = r.getID();
-    btreeFile.writeNode(s);
+    dispatchNode(s);
     btreeFile.setRootNode(s.getID());
     b_tree_split_child(s,0);
     b_tree_insert_nonfull(s,k);
