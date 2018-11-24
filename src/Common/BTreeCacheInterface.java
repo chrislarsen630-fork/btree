@@ -6,6 +6,11 @@ public interface BTreeCacheInterface{
 
 
 
+/** Sets the size of the cache, in entries. A size of 0 disables the cache.
+  * @param cacheSize Number of items to store in cache.                       */
+public void setCacheSize(int cacheSize);
+
+
 /** Searches the cache for a node, if it exists. Returns the
   * node if found, otherwise returns null.
   * @param nodeID ID of the node to search for.

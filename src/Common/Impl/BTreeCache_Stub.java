@@ -7,6 +7,8 @@ public class BTreeCache_Stub implements Common.BTreeCacheInterface{
 
 
 
+@Override public void setCacheSize(int cacheSize){}
+
 @Override public BTreeNodeInterface searchNode(int nodeID){return null;}
 
 @Override public void insertNode(BTreeNodeInterface node){}
