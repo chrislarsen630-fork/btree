@@ -9,10 +9,13 @@ public class BTree_Stub implements BTreeInterface{
 
 @Override public void setCacheSize(int cacheSize){}
 
-@Override public void createNewFile(String targetFile,int degree)
-throws OmniException{}
+@Override public void createNewFile(
+  String targetFile,int degree,int sequenceLength
+)throws OmniException{}
 
 @Override public void loadFromFile(String sourceFile) throws OmniException{}
+
+@Override public int getSequenceLength(){return 0;}
 
 @Override public BTreeNodeInterface searchKey(TreeObjectInterface key)
 throws OmniException{return null;}

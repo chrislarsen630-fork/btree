@@ -10,10 +10,13 @@ public interface BTreeFileInterface{
 /** Creates a new BTree file. Called by BTreeInterface.createNewFile().
   * @param targetFile File path for the created file. If the file exists,
   *                   it will be overwritten.
-  * @param degree Degree of the BTree.
+  * @param degree         Degree of the BTree.
+  * @param sequenceLength Length of DNA sequences, in base pairs.
   * @return Root node of the BTree.
   * @throws OmniException on file creation error.                             */
-public BTreeNodeInterface createNewFile(String targetFile,int degree) throws OmniException;
+public BTreeNodeInterface createNewFile(
+  String targetFile,int degree,int sequenceLength
+)throws OmniException;
 
 
 /** Loads an existing BTree file from disk. Called by
@@ -22,6 +25,11 @@ public BTreeNodeInterface createNewFile(String targetFile,int degree) throws Omn
   * @return Root node of the BTree.
   * @throws OmniException on file access or read error.                       */
 public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException;
+
+
+/** Returns the length of the DNA sequences.
+  * @return DNA sequence length.                                              */
+public int getSequenceLength();
 
 
 /** Loads the node with the specified ID from disk.
