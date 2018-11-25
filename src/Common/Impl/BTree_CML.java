@@ -11,8 +11,8 @@ public class BTree_CML implements BTreeInterface{
 private BTreeFileInterface  btreeFile;
 private BTreeCacheInterface btreeCache;
 private BTreeNodeInterface  rootNode;
-private int     btreeDegree  = 0;
-private int     cacheEntries = 0;
+private int btreeDegree  = 0;
+private int cacheEntries = 0;
 // STATE DATA ==================================================================
 
 
@@ -26,13 +26,15 @@ private int     cacheEntries = 0;
 
 
 // createNewFile() =============================================================
-@Override public void createNewFile(String targetFile,int degree) throws OmniException{
+@Override public void createNewFile(
+  String targetFile,int degree,int sequenceLength
+)throws OmniException{
   btreeFile  = AllocateC.new_BTreeFile();
   btreeCache = AllocateC.new_BTreeCache();
   if(cacheEntries>0)btreeCache.setCacheSize(cacheEntries);
   
   btreeDegree = degree;
-  rootNode = btreeFile.createNewFile(targetFile,degree);
+  rootNode = btreeFile.createNewFile(targetFile,degree,sequenceLength);
   rootNode.setLeaf(true);
   dispatchNode(rootNode);
 }
@@ -48,6 +50,11 @@ private int     cacheEntries = 0;
   rootNode = btreeFile.loadFromFile(sourceFile);
 }
 // loadFromFile() ==============================================================
+
+
+// getSequenceLength() =========================================================
+@Override public int getSequenceLength(){return btreeFile.getSequenceLength();}
+// getSequenceLength() =========================================================
 
 
 // searchKey() =================================================================

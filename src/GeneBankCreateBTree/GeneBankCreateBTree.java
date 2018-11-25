@@ -99,7 +99,7 @@ private void execute(String[] args){
   System.out.print("Initializing BTree...");
   BTreeInterface tree = AllocateC.new_BTree();
   try{
-    tree.createNewFile(btreeFileName,arg_btreeDegree);
+    tree.createNewFile(btreeFileName,arg_btreeDegree,arg_sequenceLength);
     tree.setCacheSize(arg_cacheSize);
   }catch(OmniException e){
     System.out.println("FAILED. Aborting.");
@@ -111,7 +111,7 @@ private void execute(String[] args){
   try{
     do{
       for(int i=0;!geneFile.isSubsequenceDone();i++){
-        if((i%300==0)&&(i>0))System.out.print(".");
+        if((i%32768==0)&&(i>0))System.out.print(".");
         long data = geneFile.readData();
         TreeObjectInterface key = AllocateC.new_TreeObject();
         key.setData(data);
@@ -298,7 +298,7 @@ private void doDebugTests(){
   if(DEBUG_DEBUGTESTS_BTREE){
     try{
       BTreeInterface tree = AllocateC.new_BTree();
-      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE);
+      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
       char[] keyArray = {'a','j','i','b','c','h','g','d','e','f'};
       for(int i=0;i<keyArray.length;i++){
         TreeObjectInterface key = AllocateC.new_TreeObject();
@@ -319,7 +319,7 @@ private void doDebugTests(){
   if(DEBUG_DEBUGTESTS_GENEBANKFILEPLUSBTREE){
     try{
       BTreeInterface tree = AllocateC.new_BTree();
-      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE);
+      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
       
       GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
       geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,DEBUG_DEBUGTESTS_SEQUENCELENGTH);

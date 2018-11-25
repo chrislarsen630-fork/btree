@@ -21,9 +21,16 @@ public void setCacheSize(int cacheSize);
   * specified by setBTreeFileInterface().
   * @param targetFile File path for the created file. If the file exists,
   *                   it will be overwritten.
-  * @param degree Degree of the BTree.
+  * @param degree         Degree of the BTree.
+  * @param sequenceLength Length of DNA sequences, in base pairs.
   * @throws OmniException on file creation error.                             */
-public void createNewFile(String targetFile,int degree) throws OmniException;
+public void createNewFile(String targetFile,int degree,int sequenceLength)
+throws OmniException;
+
+
+/** Returns the length of the DNA sequences.
+  * @return DNA sequence length.                                              */
+public int getSequenceLength();
 
 
 /** Associates BTree with an existing file and loads the root node to memory.

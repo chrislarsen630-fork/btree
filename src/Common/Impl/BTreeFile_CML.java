@@ -10,7 +10,7 @@ public class BTreeFile_CML implements BTreeFileInterface{
 
 // CONSTANTS ===================================================================
 private static final int MAGIC_NUMBER   = 0x3BADC0DE; // Java is big-endian
-private static final int FORMAT_VERSION = 0x20181124;
+private static final int FORMAT_VERSION = 0x20181125;
 // CONSTANTS ===================================================================
 
 
@@ -18,19 +18,22 @@ private static final int FORMAT_VERSION = 0x20181124;
 private RandomAccessFile filePtr;
 
 private int headerSize  = 4096;
+private int btreeDegree = 0;
+private int dnaLength   = 0;
 private int nodeSize    = 0;
 private int nodePad     = 0;
 private int nodeTotal   = 0;
-private int btreeDegree = 0;
 private int nodeCount   = 0;
 private int rootID      = 0;
 // STATE DATA ==================================================================
 
 
 // createNewFile() =============================================================
-@Override public BTreeNodeInterface createNewFile(String targetFile,int degree)
+@Override public BTreeNodeInterface createNewFile(
+  String targetFile,int degree,int sequenceLength)
 throws OmniException{
   btreeDegree = degree;
+  dnaLength   = sequenceLength;
 
   // create file  
   try{
@@ -44,8 +47,8 @@ throws OmniException{
   dummyNode.setDegree(degree);
   dummyNode.inflateToMaximumSize();
   nodeSize = dummyNode.convertToBinaryBlob().length;
-  if( (nodeSize<headerSize) && (headerSize-nodeSize<64)){
-    nodePad = headerSize-nodeSize;
+  if( (nodeSize<4096) && (4096-nodeSize<64)){
+    nodePad = 4096 - nodeSize;
   }
   nodeTotal = nodeSize + nodePad;
 
@@ -79,6 +82,11 @@ throws OmniException{
   }
 }
 // loadFromFile() ==============================================================
+
+
+// getSequenceLength() =========================================================
+@Override public int getSequenceLength(){return dnaLength;}
+// getSequenceLength() =========================================================
 
 
 // readNode() ==================================================================
@@ -159,9 +167,10 @@ private void writeHeader() throws OmniException{
     filePtr.writeInt (MAGIC_NUMBER  );
     filePtr.writeInt (FORMAT_VERSION);
     filePtr.writeInt (headerSize    );
+    filePtr.writeInt (btreeDegree   );
+    filePtr.writeInt (dnaLength     );
     filePtr.writeInt (nodeSize      );
     filePtr.writeInt (nodePad       );
-    filePtr.writeInt (btreeDegree   );
     filePtr.writeInt (nodeCount     );
     filePtr.writeLong(rootID        );
 
@@ -188,10 +197,11 @@ private void readHeader() throws OmniException{
     }
     
     headerSize  = filePtr.readInt();
+    btreeDegree = filePtr.readInt();
+    dnaLength   = filePtr.readInt();
     nodeSize    = filePtr.readInt();
     nodePad     = filePtr.readInt();
     nodeTotal   = nodeSize + nodePad;
-    btreeDegree = filePtr.readInt();
     nodeCount   = filePtr.readInt();
     rootID      = filePtr.readInt();
 

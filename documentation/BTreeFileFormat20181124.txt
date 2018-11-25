@@ -1,0 +1,204 @@
+*******************************************************************************************
+*                                                                              *
+*           Larsen-Leman-Lemieux B-Tree File Format ver. 20181125              *
+*                                                                              *
+*                           Boise State University                             *
+*                                                                              *
+*                                2018-11-25                                    *
+*                                                                              *
+*                                  CS 321                                      *
+*                                                                              *
+*******************************************************************************************
+
+
+INTRODUCTION
+------------
+This document describes the B-tree file format used by the programs
+GeneBankCreateBTree and GeneBankSearch, created by Christopher M. Larsen,
+Dylan Lemand and Landon Lemieux for the final project of CS 321 at
+Boise State University.
+
+
+OVERVIEW
+--------
+
+These files are created with the name xyz.gbk.btree.data.k.t, where xyz is
+the name of the NCBI GeneBank file it was created from, k is the DNA base
+pair sequence length (1 to 31), and t is the degree of the B-tree stored in
+the file.
+
+The file contents are stored in big-endian binary format. Each file begins
+with a 4096 byte header, followed by an arbitrary number of B-tree nodes of
+constant size.
+
+
+              +---------------------------------+----------+
+              |             OFFSET              |   DATA   |
+              +---------------------------------+----------+
+              |                0                |  header  |
+              |  headerSize+(nodePaddedSize*0)  |  node 1  |
+              |  headerSize+(nodePaddedSize*1)  |  node 2  |
+              |  headerSize+(nodePaddedSize*2)  |  node 3  |
+              |  headerSize+(nodePaddedSize*3)  |  node 4  |
+              |                .                |    .     |
+              |                .                |    .     |
+              |                .                |    .     |
+              +---------------------------------+----------+
+
+
+HEADER FORMAT
+-------------
+
+The header is 4096 bytes, but mostly consists of padding bytes.
+The first 40 bytes identify the file as a B-tree file and provide
+information vital to parsing the remainder of the file.
+
+
+              +----------+--------------+--------------------+
+              |  OFFSET  |    TYPE      |       DATA         |
+              +----------+--------------+--------------------+
+              |    0     |    int       |  MAGIC_NUMBER      |
+              |    4     |    int       |  FORMAT_VERSION    |
+              |    8     |    int       |  headerPaddedSize  |
+              |   12     |    int       |  btreeDegree       |
+              |   16     |    int       |  sequenceLength    |
+              |   20     |    int       |  nodeSize          |
+              |   24     |    int       |  nodePad           |
+              |   28     |    int       |  nodeCount         |
+              |   32     |    long      |  rootID            |
+              |   40     |  byte[4060]  |  reserved          |
+              +----------+--------------+--------------------+
+
+
+  MAGIC_NUMBER    Identifies the file as a B-tree file. Always has the
+                  value 0x3BADC0DE. Any other value is not a valid
+                  B-Tree file.
+
+  FORMAT_VERSION  Identifies the file format version. This document
+                  describes version 0x20181125.
+
+  headerSize      Total padded size of the header in bytes. Always 4096 in
+                  this revision of the file format.
+
+  nodeSize        Size of a node in bytes. Does not include padding bytes,
+                  if any.
+
+  nodePad         Number of node padding bytes. Padding bytes are only
+                  written if (4096-nodeSize)<64, and will result in a total
+                  node size of exactly 4096 bytes. nodePaddedSize is the
+                  sum of nodeSize and nodePad:
+
+                  nodePaddedSize = nodeSize + nodePad
+
+  btreeDegree     Degree of the B-tree; sets the limit of the number of
+                  keys and children a node may contain.
+
+  nodeCount       Number of nodes contained in the file. The total size of
+                  the file should be:
+
+                  fileSize = headerSize + (nodeCount * nodePaddedSize)
+
+  rootID          ID of the root node. All other nodes should be descendents
+                  of this node, so the entire tree may be traversed by first
+                  accessing this node.
+
+  reserved        Reserved padding bytes. Should be written with the value
+                  0 and ignored by parsers.
+
+
+NODE FORMAT
+-----------
+
+Node size is determined by the degree of the B-tree. Each node has a unique
+ID, which is not stored but may be determined by the node's offset in the
+file.
+
+
+      nodeID = ( (nodeByteOffset - headerSize) / nodePaddedSize ) + 1
+
+
+Conversely, a node's byte offset may be determined by its ID.
+
+
+      nodeByteOffset = headerSize + ( (nodeID-1) * nodePaddedSize )
+
+
+Each node contains the number of valid keys, a fixed-size array of key
+objects, a fixed-size array of the nodeIDs of the node's children, and a
+flag indicating whether the node is a leaf.
+
+The binary format of these fields is slightly idiosyncratic. Since Java does
+not have an unsigned byte type, each byte is stored as actualValue-128 to
+reduce the overhead involved in parsing the data. Hence an integer value of
+0x00000000 is stored as 0x80808080. A parser must read in each field as
+individual bytes and add 128 prior to conversion to the final type.
+
+
+ +---------------------------+--------------------------------+---------------+
+ |            OFFSET         |              TYPE              |     DATA      |
+ +---------------------------+--------------------------------+---------------+
+ |              0            |              int               |    nKeys      |
+ |                           |                                |               |
+ |              4            |   TreeObject[btreeDegree*2-1]  |    keys       |
+ |                           |                                |               |
+ |  4+12*(btreeDegree*2-1)   |       int[btreeDegree*2]       |  childrenIDs  |
+ |                           |                                |               |
+ |  4+12*(btreeDegree*2-1)   |              byte              |    isLeaf     |
+ |      +btreeDegree*8       |                                |               |
+ |                           |                                |               |
+ |  5+12*(btreeDegree*2-1)   |            byte[nodePad]       |   reserved    |
+ |      +btreeDegree*8       |                                |               |
+ |                           |                                |               |
+ +---------------------------+--------------------------------+---------------+
+
+
+  nKeys        The number of valid keys stored in the node. The keys array is
+               a fixed size, but only the indexes from 0 to nKeys contain 
+               valid keys. If the node is not a leaf, the number of valid
+               children is nKeys+1.
+
+  keys         Array of TreeObjects containing the DNA sequence data. Only the
+               first nKeys indexes are valid.
+
+  childrenIDs  Array of the nodeIDs of the node's children. Only valid if the
+               node is not a leaf, and only the first nKeys+1 indexes are
+               valid.
+
+  isLeaf       Value indicating whether the node is a leaf. 0 if the node is
+               not a leaf, 1 if it is.
+
+  reserved     Reserved padding bytes. Only present if nodePad is not 0.
+               Exempt from the idiosyncratic binary format note; all bytes
+               should be written as 0 and ignored by parsers.
+
+
+TREEOBJECT FORMAT
+-----------------
+
+Each TreeObject contains a single DNA sequence, packed as a 64-bit long, and
+a frequency count of the number of times the sequence appeared in the original
+GBK file.
+
+The data contained inside a TreeObject has the same idiosyncratic binary format
+described in the node format: each byte is stored as actualValue-128.
+
+
+                   +----------+--------+---------------+
+                   |  OFFSET  |  TYPE  |  DATA         |
+                   +----------+--------+---------------+
+                   |    0     |  long  |  dnaSequence  |
+                   |    8     |  int   |  frequency    |
+                   +----------+--------+---------------+
+
+
+  dnaSequence  Packed sequence of DNA base pairs. Each base pair is stored in
+               two bits, with the final base pair of the sequence in the two
+               least significant bits of the field; the first base pair is
+               stored at bits (sequenceLength-1)*2 and 1+(sequenceLength-1)*2.
+               The encoding is as follows:
+
+               0b00 Adenine  0b01 Cytosine  0b10 Guanine  0b11 Thiamine
+
+  frequency    Number of times the sequence appeared in the source GBK file.
+
+
