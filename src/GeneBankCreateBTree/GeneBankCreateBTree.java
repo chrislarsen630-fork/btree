@@ -67,7 +67,7 @@ private void execute(String[] args){
     displayUsage();
     return;
   }
-  String btreeFileName     = arg_gbkFile+".btree."+arg_sequenceLength;
+  String btreeFileName     = arg_gbkFile+".btree.data."+arg_sequenceLength+"."+arg_btreeDegree;
   String btreeDumpFileName = arg_gbkFile+".btree.dump."+arg_sequenceLength;
   if(arg_btreeDegree==0)arg_btreeDegree = getOptimalBTreeDegree(4096);
 
