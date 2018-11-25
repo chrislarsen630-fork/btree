@@ -74,8 +74,13 @@ private int     cacheEntries = 0;
 // insertKey() =================================================================
 
 
+// getRootNode() ===============================================================
+@Override public BTreeNodeInterface getRootNode(){return rootNode;}
+// getRootNode() ===============================================================
+
+
 // fetchNode() =================================================================
-private BTreeNodeInterface fetchNode(int id) throws OmniException{
+@Override public BTreeNodeInterface fetchNode(int id) throws OmniException{
   if(id==rootNode.getID())return rootNode;
   if(cacheEntries>0){
     BTreeNodeInterface ret = btreeCache.searchNode(id);

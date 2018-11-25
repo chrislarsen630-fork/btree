@@ -51,8 +51,8 @@ private int  frequency = 0;
 // convertToBinaryBlob() =======================================================
 @Override public byte[] convertToBinaryBlob(){
   byte[] blob = new byte[12];
-  for(int i=0;i<8;i++)blob[i  ] = (byte)((data     >>((7-i)*8)) & 0xFF);
-  for(int i=0;i<4;i++)blob[i+8] = (byte)((frequency>>((3-i)*8)) & 0xFF);
+  for(int i=0;i<8;i++)blob[i  ] = (byte)(((data     >>((7-i)*8)) & 0xFF)-128);
+  for(int i=0;i<4;i++)blob[i+8] = (byte)(((frequency>>((3-i)*8)) & 0xFF)-128);
   return blob;
 }
 // convertToBinaryBlob() =======================================================
@@ -64,15 +64,11 @@ private int  frequency = 0;
   frequency = 0;
 
   for(int i=0;i<8;i++){
-    long v   = blob[i];
-    if(v<0)v = 256+v;
-    data    |= v<<((7-i)*8);
+    data |= (((long)blob[i])+128) << ((7-i)*8);
   }
 
   for(int i=0;i<4;i++){
-    int v      = blob[i+8];
-    if(v<0)v   = 256+v;
-    frequency |= v<<((3-i)*8);
+    frequency |= (((int)blob[i+8])+128) << ((3-i)*8);
   }
 }
 // convertFromBinaryBlob() =====================================================
