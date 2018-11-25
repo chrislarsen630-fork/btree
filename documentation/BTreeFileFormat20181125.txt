@@ -127,12 +127,6 @@ Each node contains the number of valid keys, a fixed-size array of key
 objects, a fixed-size array of the nodeIDs of the node's children, and a
 flag indicating whether the node is a leaf.
 
-The binary format of these fields is slightly idiosyncratic. Since Java does
-not have an unsigned byte type, each byte is stored as actualValue-128 to
-reduce the overhead involved in parsing the data. Hence an integer value of
-0x00000000 is stored as 0x80808080. A parser must read in each field as
-individual bytes and add 128 prior to conversion to the final type.
-
 
  +---------------------------+--------------------------------+---------------+
  |            OFFSET         |              TYPE              |     DATA      |
@@ -168,8 +162,6 @@ individual bytes and add 128 prior to conversion to the final type.
                not a leaf, 1 if it is.
 
   reserved     Reserved padding bytes. Only present if nodePad is not 0.
-               Exempt from the idiosyncratic binary format note; all bytes
-               should be written as 0 and ignored by parsers.
 
 
 TREEOBJECT FORMAT
@@ -178,9 +170,6 @@ TREEOBJECT FORMAT
 Each TreeObject contains a single DNA sequence, packed as a 64-bit long, and
 a frequency count of the number of times the sequence appeared in the original
 GBK file.
-
-The data contained inside a TreeObject has the same idiosyncratic binary format
-described in the node format: each byte is stored as actualValue-128.
 
 
                    +----------+--------+---------------+

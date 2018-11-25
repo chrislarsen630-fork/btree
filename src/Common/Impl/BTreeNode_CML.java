@@ -83,7 +83,7 @@ int[]                 childrenIDArray;
   
   int offset = 0;
   
-  for(int i=0;i<4;i++)blob[i+offset] = (byte)(((nKeys>>(i*8)) & 0xFF)-128);
+  for(int i=0;i<4;i++)blob[i+offset] = (byte)((nKeys>>((3-i)*8)) & 0xFF);
   offset += 4;
   
   for(int j=0;j<maxKeys;j++){
@@ -95,7 +95,7 @@ int[]                 childrenIDArray;
   
   for(int j=0;j<maxChildren;j++){
     int childID = childrenIDArray[j];
-    for(int i=0;i<4;i++)blob[i+offset] = (byte)(((childID>>((3-i)*8)) & 0xFF)-128);
+    for(int i=0;i<4;i++)blob[i+offset] = (byte)((childID>>((3-i)*8)) & 0xFF);
     offset += 4;
   }
   
@@ -114,7 +114,7 @@ int[]                 childrenIDArray;
   
   nKeys = 0;
   for(int i=0;i<4;i++){
-    nKeys |= (((int)blob[i+offset])+128) << (i*8);
+    nKeys |= (((int)blob[i+offset])&0xFF) << ((3-i)*8);
   }
   offset += 4;
   
@@ -129,7 +129,7 @@ int[]                 childrenIDArray;
   for(int j=0;j<maxChildren;j++){
     int childID = 0;
     for(int i=0;i<4;i++){
-      childID |= (((int)blob[i+offset])+128) << ((3-i)*8);
+      childID |= (((int)blob[i+offset])&0xFF) << ((3-i)*8);
     }
     childrenIDArray[j] = childID;
     offset += 4;
