@@ -135,6 +135,7 @@ private void execute(String[] args){
     }catch(OmniException e){System.out.println("FAILED.");}
   }
   
+  tree.dealloc();
   long runtime = (System.currentTimeMillis() - performanceTimer) / 1000;
   System.out.println();
   System.out.println("Program complete in "+runtime+" seconds.");
