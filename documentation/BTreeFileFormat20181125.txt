@@ -146,7 +146,7 @@ individual bytes and add 128 prior to conversion to the final type.
  |  4+12*(btreeDegree*2-1)   |              byte              |    isLeaf     |
  |      +btreeDegree*8       |                                |               |
  |                           |                                |               |
- |  5+12*(btreeDegree*2-1)   |            byte[nodePad]       |   reserved    |
+ |  5+12*(btreeDegree*2-1)   |          byte[nodePad]         |   reserved    |
  |      +btreeDegree*8       |                                |               |
  |                           |                                |               |
  +---------------------------+--------------------------------+---------------+
