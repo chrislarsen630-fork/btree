@@ -74,7 +74,7 @@ throws OmniException{
 // loadFromFile() ==============================================================
 @Override public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException{
   try{
-    filePtr = new RandomAccessFile(sourceFile,"rwd");
+    filePtr = new RandomAccessFile(sourceFile,"rw");
     readHeader();
     return readNode(rootID);
   }catch(IOException e){
