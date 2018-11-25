@@ -25,5 +25,8 @@ throws OmniException{return null;}
   return null;
 }
 
+@Override public void dealloc(){}
+
+
 
 } // class BTree_Stub

@@ -79,6 +79,11 @@ private int     cacheEntries = 0;
 // getRootNode() ===============================================================
 
 
+// dealloc() ===================================================================
+@Override public void dealloc(){btreeFile.close();}
+// dealloc() ===================================================================
+
+
 // fetchNode() =================================================================
 @Override public BTreeNodeInterface fetchNode(int id) throws OmniException{
   if(id==rootNode.getID())return rootNode;

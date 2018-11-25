@@ -19,6 +19,8 @@ public class BTreeFile_Stub implements BTreeFileInterface{
 
 @Override public void setRootNode(int nodeID){}
 
+@Override public void close(){}
+
 
 
 } // class BTreeFile_Stub

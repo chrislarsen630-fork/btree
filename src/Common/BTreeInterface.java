@@ -40,12 +40,14 @@ public void loadFromFile(String sourceFile) throws OmniException;
 /** Searches for a key from the root node. Returns the node containing the
   * key, or null if it is not found.
   * @param key Key value to search for.
-  * @return Node containing the key, or null if not found.                    */
+  * @return Node containing the key, or null if not found.                    
+  * @throws OmniException on file read error                                  */
 public BTreeNodeInterface searchKey(TreeObjectInterface key) throws OmniException;
 
 
 /** Inserts a key into the tree. 
-  * @param key Key value to insert.                                           */
+  * @param key Key value to insert.
+  * @throws OmniException on file read error.                                 */
 public void insertKey(TreeObjectInterface key) throws OmniException;
 
 
@@ -54,7 +56,18 @@ public void insertKey(TreeObjectInterface key) throws OmniException;
 public BTreeNodeInterface getRootNode();
 
 
+/** Returns the node with the given ID, first checking the root node and
+  * cache, then disk. Null if no node is found.
+  * @param id ID of the node to fetch.
+  * @throws OmniException on file read error.                              
+  * @return Node matching the ID.                                             */
 public BTreeNodeInterface fetchNode(int id) throws OmniException;
+
+
+/** Ensures the BTree is written to disk and releases the resources held by
+  * the BTree.                                                                */
+public void dealloc();
+
 
 
 } // interface BTreeInterface

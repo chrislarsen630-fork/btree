@@ -48,5 +48,9 @@ public void writeNode(BTreeNodeInterface node) throws OmniException;
 public void setRootNode(int nodeID);
 
 
+/** Closes the file stream and deallocates resources.                         */
+public void close();
+
+
 
 } // interface BTreeFileInterface

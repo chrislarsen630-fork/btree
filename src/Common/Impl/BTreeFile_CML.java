@@ -34,7 +34,7 @@ throws OmniException{
 
   // create file  
   try{
-    filePtr = new RandomAccessFile(targetFile,"rwd");
+    filePtr = new RandomAccessFile(targetFile,"rw");
   }catch(IOException e){
     throw new OmniException(OmniException.FILE_ACCESS,"Issue creating BTree file.");
   }
@@ -213,6 +213,11 @@ private void readHeader() throws OmniException{
   try{writeHeader();}catch(OmniException e){}
 }
 // setRootNode() ===============================================================
+
+
+// close() =====================================================================
+@Override public void close(){try{filePtr.close();}catch(IOException e){}}
+// close() =====================================================================
 
 
 
