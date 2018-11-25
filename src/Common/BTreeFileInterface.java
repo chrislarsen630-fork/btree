@@ -31,10 +31,10 @@ public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException;
 public BTreeNodeInterface readNode(int nodeID) throws OmniException;
 
 
-/** Allocates space for a new BTree node and returns its ID number.
-  * @return ID of the newly allocated node.
+/** Allocates space for a new BTree node and returns the newly created node.
+  * @return A newly allocated node.
   * @throws OmniException if a new node cannot be allocated.                  */
-public int allocateNode() throws OmniException;
+public BTreeNodeInterface allocateNode() throws OmniException;
 
 
 /** Saves a node to disk.

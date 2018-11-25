@@ -10,7 +10,7 @@ public class BTreeFile_CML implements BTreeFileInterface{
 
 // CONSTANTS ===================================================================
 private static final int MAGIC_NUMBER   = 0x3BADC0DE; // Java is big-endian
-private static final int FORMAT_VERSION = 0x20181121;
+private static final int FORMAT_VERSION = 0x20181124;
 // CONSTANTS ===================================================================
 
 
@@ -19,6 +19,8 @@ private RandomAccessFile filePtr;
 
 private int headerSize  = 4096;
 private int nodeSize    = 0;
+private int nodePad     = 0;
+private int nodeTotal   = 0;
 private int btreeDegree = 0;
 private int nodeCount   = 0;
 private int rootID      = 0;
@@ -42,6 +44,10 @@ throws OmniException{
   dummyNode.setDegree(degree);
   dummyNode.inflateToMaximumSize();
   nodeSize = dummyNode.convertToBinaryBlob().length;
+  if( (nodeSize<headerSize) && (headerSize-nodeSize<64)){
+    nodePad = headerSize-nodeSize;
+  }
+  nodeTotal = nodeSize + nodePad;
 
   // write header padding and data
   try{
@@ -53,7 +59,7 @@ throws OmniException{
   }
 
   // create root node
-  rootID = allocateNode();
+  rootID = allocateNode().getID();
   BTreeNodeInterface ret = readNode(rootID);
   ret.setLeaf(true);
   writeNode(ret);
@@ -83,7 +89,7 @@ throws OmniException{
 
   try{
     byte[] blob = new byte[nodeSize];
-    filePtr.seek(headerSize + ((nodeID-1) * nodeSize));
+    filePtr.seek(headerSize + ((nodeID-1) * nodeTotal));
     filePtr.read(blob);
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
     node.setDegree(btreeDegree);
@@ -100,31 +106,28 @@ throws OmniException{
 
 
 // allocateNode() ==============================================================
-@Override public int allocateNode() throws OmniException{
+@Override public BTreeNodeInterface allocateNode() throws OmniException{
   try{
     // calculate file position
-    int pos = headerSize + (nodeCount * nodeSize);
-
-    // write padding
-    filePtr.seek(pos);
-    filePtr.write(new byte[nodeSize]);
+    int pos = headerSize + (nodeCount * nodeTotal);
 
     // write node
+    filePtr.seek(pos);
     BTreeNodeInterface node = AllocateC.new_BTreeNode();
     node.setID    (nodeCount+1);
     node.setDegree(btreeDegree);
     filePtr.seek(pos);
     filePtr.write(node.convertToBinaryBlob());
+    if(nodePad>0)filePtr.write(new byte[nodePad]);
 
+    nodeCount++;
+    writeHeader();
+    return node;
   }catch(IOException e){
     throw new OmniException(
       OmniException.FILE_WRITE_ERROR,"Unable to create node in BTree file."
     );
   }
-
-  nodeCount++;
-  writeHeader();
-  return nodeCount;
 }
 // allocateNode() ==============================================================
 
@@ -137,7 +140,7 @@ throws OmniException{
   }
   
   try{
-    filePtr.seek(headerSize + ((node.getID()-1) * nodeSize));
+    filePtr.seek(headerSize + ((node.getID()-1) * nodeTotal));
     filePtr.write(node.convertToBinaryBlob());
   }catch(IOException e){
     throw new OmniException(
@@ -157,6 +160,7 @@ private void writeHeader() throws OmniException{
     filePtr.writeInt (FORMAT_VERSION);
     filePtr.writeInt (headerSize    );
     filePtr.writeInt (nodeSize      );
+    filePtr.writeInt (nodePad       );
     filePtr.writeInt (btreeDegree   );
     filePtr.writeInt (nodeCount     );
     filePtr.writeLong(rootID        );
@@ -179,12 +183,14 @@ private void readHeader() throws OmniException{
       throw new OmniException(OmniException.FILE_READ_ERROR,"Malformed BTree file.");
     }
     
-    if(filePtr.readInt()>FORMAT_VERSION){
+    if(filePtr.readInt()!=FORMAT_VERSION){
       throw new OmniException(OmniException.FILE_READ_ERROR,"Incompatible BTree version.");  
     }
     
     headerSize  = filePtr.readInt();
     nodeSize    = filePtr.readInt();
+    nodePad     = filePtr.readInt();
+    nodeTotal   = nodeSize + nodePad;
     btreeDegree = filePtr.readInt();
     nodeCount   = filePtr.readInt();
     rootID      = filePtr.readInt();

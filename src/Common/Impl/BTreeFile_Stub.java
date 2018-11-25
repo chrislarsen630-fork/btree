@@ -13,7 +13,7 @@ public class BTreeFile_Stub implements BTreeFileInterface{
 
 @Override public BTreeNodeInterface readNode(int nodeID) throws OmniException{return null;}
 
-@Override public int allocateNode() throws OmniException{return 0;}
+@Override public BTreeNodeInterface allocateNode() throws OmniException{return null;}
 
 @Override public void writeNode(BTreeNodeInterface node) throws OmniException{}
 

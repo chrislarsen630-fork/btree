@@ -9,7 +9,8 @@ public class GeneBankCreateBTree{
 
 // DEBUG SETTINGS ==============================================================
 private final boolean DEBUG_DEBUGTESTS                       = false;
-private final int     DEBUG_DEBUGTESTS_BTREEDEGREE           = 2;
+private final int     DEBUG_DEBUGTESTS_BTREEDEGREE           = 64;
+private final int     DEBUG_DEBUGTESTS_SEQUENCELENGTH        = 6;
 private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = false;
 private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
 private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = false;
@@ -59,12 +60,15 @@ private void execute(String[] args){
     doDebugTests();
     return;
   }
-    
+
+  long performanceTimer = System.currentTimeMillis();
+  
   if(!parseArguments(args)){
     displayUsage();
     return;
   }
-  String btreeFileName = arg_gbkFile+".btree.bin";
+  String btreeFileName     = arg_gbkFile+".btree."+arg_sequenceLength;
+  String btreeDumpFileName = arg_gbkFile+".btree.dump."+arg_sequenceLength;
   if(arg_btreeDegree==0)arg_btreeDegree = getOptimalBTreeDegree(4096);
 
   System.out.println("+ + + GeneBankCreateBTree + + +"                        );
@@ -77,14 +81,15 @@ private void execute(String[] args){
   }else{
     System.out.print(" No cache will be used"                                 );
   }
-  System.out.print(", and "+(arg_debugLevel==1?"a":"no")+" debug file "       );
-  System.out.println("will be created."                                       );
+  System.out.print(", and "+(arg_debugLevel==1?"a":"no")+" debug file"        );
+  if(arg_debugLevel==1)System.out.print(" named "+btreeDumpFileName         );
+  System.out.println(" will be created."                                      );
   System.out.println(                                                         );
 
   System.out.print("Parsing GBK file...");
   GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
   try{
-    geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,1);
+    geneFile.loadFromFile(arg_gbkFile,arg_sequenceLength);
   }catch(OmniException e){
     System.out.println("FAILED. Aborting.");
     return;
@@ -106,22 +111,33 @@ private void execute(String[] args){
   try{
     do{
       for(int i=0;!geneFile.isSubsequenceDone();i++){
-        if(i%300==0&&i>0)System.out.print(".");
+        if((i%300==0)&&(i>0))System.out.print(".");
         long data = geneFile.readData();
         TreeObjectInterface key = AllocateC.new_TreeObject();
         key.setData(data);
-        tree.insertKey(key);          
+        tree.insertKey(key);
       }
     }while(geneFile.nextSubsequence());
-    System.out.println();
   }catch(OmniException e){
     System.out.println();
     System.out.println("Encountered an error while parsing GBK file. Aborting,");
     return;
   }
+  System.out.println();
   System.out.println("Successfully populated BTree.");
   
-  System.out.println("Operation successful.");
+  if(arg_debugLevel==1){
+    try{
+      System.out.print("Writing debug dump file...");
+      DebugFileDumperInterface dumper = AllocateB.new_DebugFileDumper();
+      dumper.dumpBTreeToFile(tree,arg_gbkFile+".btree.dump."+arg_sequenceLength,arg_sequenceLength);
+      System.out.println("OK.");
+    }catch(OmniException e){System.out.println("FAILED.");}
+  }
+  
+  long runtime = (System.currentTimeMillis() - performanceTimer) / 1000;
+  System.out.println();
+  System.out.println("Program complete in "+runtime+" seconds.");
 }
 // execute() ===================================================================
 
@@ -305,7 +321,7 @@ private void doDebugTests(){
       tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE);
       
       GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
-      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,1);
+      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
       do{
         for(int i=0;!geneFile.isSubsequenceDone();i++){
           if(i%60==0&&i>0)System.out.println();
@@ -317,7 +333,9 @@ private void doDebugTests(){
         }
         System.out.println();
         System.out.println();
-      }while(geneFile.nextSubsequence());      
+      }while(geneFile.nextSubsequence());
+      DebugFileDumperInterface dump = AllocateB.new_DebugFileDumper();
+      dump.dumpBTreeToFile(tree,"blah.txt",DEBUG_DEBUGTESTS_SEQUENCELENGTH);
     }catch(OmniException e){System.out.println("THREW EXCEPTION");}
   }
 }

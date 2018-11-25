@@ -19,6 +19,11 @@ throws OmniException{return null;}
 
 @Override public void insertKey(TreeObjectInterface key) throws OmniException{}
 
+@Override public BTreeNodeInterface getRootNode(){return null;}
+
+@Override public BTreeNodeInterface fetchNode(int id) throws OmniException{
+  return null;
+}
 
 
 } // class BTree_Stub

@@ -49,5 +49,12 @@ public BTreeNodeInterface searchKey(TreeObjectInterface key) throws OmniExceptio
 public void insertKey(TreeObjectInterface key) throws OmniException;
 
 
+/** Returns the node at the root of the tree.
+  * @return Root BTree node.                                                  */
+public BTreeNodeInterface getRootNode();
+
+
+public BTreeNodeInterface fetchNode(int id) throws OmniException;
+
 
 } // interface BTreeInterface
