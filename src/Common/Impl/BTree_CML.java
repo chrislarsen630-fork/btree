@@ -119,7 +119,7 @@ private BTreeNodeInterface b_tree_search(BTreeNodeInterface x,TreeObjectInterfac
 private void b_tree_split_child(BTreeNodeInterface x,int i,BTreeNodeInterface y) throws OmniException{
   int t  = btreeDegree;
   int xN = x.getNKeys();
-  BTreeNodeInterface z = fetchNode(btreeFile.allocateNode());
+  BTreeNodeInterface z = btreeFile.allocateNode();
   z.setLeaf(y.isLeaf());
   z.setNKeys(t-1);
   TreeObjectInterface[] xKey = x.getKeyArray();
@@ -179,7 +179,7 @@ private void b_tree_insert(TreeObjectInterface k) throws OmniException{
   BTreeNodeInterface r = rootNode;
   int rN = r.getNKeys();
   if(rN==2*t-1){
-    BTreeNodeInterface s = fetchNode(btreeFile.allocateNode());
+    BTreeNodeInterface s = btreeFile.allocateNode();
     rootNode = s;
     s.setLeaf(false);
     s.setNKeys(0);

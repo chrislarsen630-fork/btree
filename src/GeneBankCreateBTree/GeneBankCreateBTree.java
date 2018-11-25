@@ -62,7 +62,9 @@ private void execute(String[] args){
     doDebugTests();
     return;
   }
-    
+
+  long performanceTimer = System.currentTimeMillis();
+  
   if(!parseArguments(args)){
     displayUsage();
     return;
@@ -137,8 +139,9 @@ private void execute(String[] args){
     }catch(OmniException e){System.out.println("FAILED.");}
   }
   
+  long runtime = (System.currentTimeMillis() - performanceTimer) / 1000;
   System.out.println();
-  System.out.println("Program complete.");
+  System.out.println("Program complete in "+runtime+" seconds.");
 }
 // execute() ===================================================================
 
