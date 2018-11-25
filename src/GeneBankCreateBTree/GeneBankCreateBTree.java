@@ -45,8 +45,6 @@ public static void main(String[] args){
     System.out.println("==FATAL ERROR==");
     if(e.getMessage()!=null){
       System.out.println("Error message: \""+e.getMessage()+"\"");
-      System.out.println("Stack trace: ");
-      e.printStackTrace();
     }
   }
   System.out.println();
@@ -110,7 +108,6 @@ private void execute(String[] args){
   System.out.println("OK.");
 
   System.out.print("Populating BTree. Standby.");
-  int count = 0;
   try{
     do{
       for(int i=0;!geneFile.isSubsequenceDone();i++){
@@ -119,7 +116,6 @@ private void execute(String[] args){
         TreeObjectInterface key = AllocateC.new_TreeObject();
         key.setData(data);
         tree.insertKey(key);
-        count++;
       }
     }while(geneFile.nextSubsequence());
   }catch(OmniException e){
