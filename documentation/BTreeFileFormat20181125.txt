@@ -49,7 +49,7 @@ constant size.
 HEADER FORMAT
 -------------
 
-The header is 4096 bytes, but mostly consists of padding bytes.
+The header is 4096 bytes, but consists mostly of padding bytes.
 The first 40 bytes identify the file as a B-tree file and provide
 information vital to parsing the remainder of the file.
 
@@ -66,44 +66,47 @@ information vital to parsing the remainder of the file.
               |   24     |    int       |  nodePad           |
               |   28     |    int       |  nodeCount         |
               |   32     |    long      |  rootID            |
-              |   40     |  byte[4060]  |  reserved          |
+              |   40     |  byte[4056]  |  reserved          |
               +----------+--------------+--------------------+
 
 
-  MAGIC_NUMBER    Identifies the file as a B-tree file. Always has the
-                  value 0x3BADC0DE. Any other value is not a valid
-                  B-Tree file.
+  MAGIC_NUMBER      Identifies the file as a B-tree file. Always has the
+                    value 0x3BADC0DE. Any other value is not a valid
+                    B-Tree file.
 
-  FORMAT_VERSION  Identifies the file format version. This document
-                  describes version 0x20181125.
+  FORMAT_VERSION    Identifies the file format version. This document
+                    describes version 0x20181125.
 
-  headerSize      Total padded size of the header in bytes. Always 4096 in
-                  this revision of the file format.
+  headerPaddedSize  Total padded size of the header in bytes. Always 4096 in
+                    this revision of the file format.
 
-  nodeSize        Size of a node in bytes. Does not include padding bytes,
-                  if any.
+  btreeDegree       Degree of the B-tree; sets the limit of the number of
+                    keys and children a node may contain.
 
-  nodePad         Number of node padding bytes. Padding bytes are only
-                  written if (4096-nodeSize)<64, and will result in a total
-                  node size of exactly 4096 bytes. nodePaddedSize is the
-                  sum of nodeSize and nodePad:
+  sequenceLength    Length of the stored DNA sequences, in base pairs. Only
+                    valid if in the range 1 to 31.
 
-                  nodePaddedSize = nodeSize + nodePad
+  nodeSize          Size of a node in bytes. Does not include padding bytes,
+                    if any.
 
-  btreeDegree     Degree of the B-tree; sets the limit of the number of
-                  keys and children a node may contain.
+  nodePad           Number of node padding bytes. Padding bytes are only
+                    written if (4096-nodeSize)<64, and will result in a total
+                    node size of exactly 4096 bytes. nodePaddedSize is the
+                    sum of nodeSize and nodePad:
 
-  nodeCount       Number of nodes contained in the file. The total size of
-                  the file should be:
+                    nodePaddedSize = nodeSize + nodePad
 
-                  fileSize = headerSize + (nodeCount * nodePaddedSize)
+  nodeCount         Number of nodes contained in the file. The total size of
+                    the file should be:
 
-  rootID          ID of the root node. All other nodes should be descendents
-                  of this node, so the entire tree may be traversed by first
-                  accessing this node.
+                    fileSize = headerSize + (nodeCount * nodePaddedSize)
 
-  reserved        Reserved padding bytes. Should be written with the value
-                  0 and ignored by parsers.
+  rootID            ID of the root node. All other nodes should be descendents
+                    of this node, so the entire tree may be traversed by first
+                    accessing this node.
+
+  reserved          Reserved padding bytes. Should be written with the value
+                    0 and ignored by parsers.
 
 
 NODE FORMAT
