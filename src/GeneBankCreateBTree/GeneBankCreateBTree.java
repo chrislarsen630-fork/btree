@@ -77,7 +77,7 @@ private void execute(String[] args){
   System.out.print(arg_btreeDegree+" and sequence length "+arg_sequenceLength );
   System.out.print(" will be created from the GBK file "+arg_gbkFile+"."      );
   if(arg_useCache==1){
-    System.out.print(" A "+arg_cacheSize+" byte cache will be used"           );
+    System.out.print(" A "+arg_cacheSize+" entry cache will be used"           );
   }else{
     System.out.print(" No cache will be used"                                 );
   }
