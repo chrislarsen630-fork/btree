@@ -2,21 +2,17 @@ package Common.Impl;
 
 import Common.*;
 
-/** BTree cache interface. Stores recently accessed nodes in memory to
- * reduce disk I/O.                                                          */
-public class BTreeCache implements BTreeCacheInterface{
+//** Landon and Dylan's implementation of BTreeCache. */
+public class BTreeCache_LLDL implements BTreeCacheInterface{
     private BTreeNodeInterface [] cache;
-    private int capacity;
-    private int numElements;
-
-    public BTreeCache(int size){
-    this.capacity = size;
-    cache = new BTreeNodeInterface[capacity];
-    }
+    private int capacity    = 0;
+    private int numElements = 0;
 
     /** Sets the size of the cache, in entries. A size of 0 disables the cache.
      * @param cacheSize Number of items to store in cache.                       */
     @Override public void setCacheSize(int cacheSize) {
+        this.capacity = cacheSize;
+        cache = new BTreeNodeInterface[cacheSize];
         cache = java.util.Arrays.copyOf(cache,cacheSize);
     }
 
@@ -32,7 +28,7 @@ public class BTreeCache implements BTreeCacheInterface{
                     cache[j] = cache[j-1];
                 }
                 cache[0] = temp;
-                return cache[i];
+                return temp;
             }
         }
         return null;
@@ -46,7 +42,7 @@ public class BTreeCache implements BTreeCacheInterface{
             cache[i] = cache[i-1];
         }
         cache[0] = node;
-        if(numElements<=capacity){
+        if(numElements<capacity){
             numElements++;
         }
     }
