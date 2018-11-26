@@ -4,6 +4,15 @@ public class GeneBankSearch{
 
 
 
+// STATE DATA ==================================================================
+private int    arg_useCache;
+private String arg_btreeFile;
+private String arg_queryFile;
+private int    arg_cacheSize  = 0;
+private int    arg_debugLevel = 0;
+// STATE DATA ==================================================================
+
+
 /** Program entry point. Creates an instance of the GeneBankSearch class
   * and executes it. Acts as a safety net for any unhandled exceptions thrown
   * elsewhere within the program. Do not add any code to this -- it goes in
@@ -69,16 +78,18 @@ private boolean parseArguments(String[] args){
     arg_queryFile = args[2];
 
     // parse fourth argument (cache size)
-    if(args.length>4)arg_cacheSize = new Integer(args[4]);
+    if(args.length>3)arg_cacheSize = new Integer(args[3]);
     if(arg_cacheSize<0)return false;
     if(arg_useCache==0)arg_cacheSize = 0;
 
     // parse fifth argument (debug level)
-    if(args.length>5)arg_debugLevel = new Integer(args[5]);
+    if(args.length>4)arg_debugLevel = new Integer(args[4]);
     if( (arg_debugLevel<0) || (arg_debugLevel>1) )return false;
 
     return true;
-  }catch(Exception e){return false;}}
-  //parseArguments()
+  }catch(Exception e){return false;}
+} //parseArguments()
+
+
 
 } // class GeneBankSearch
