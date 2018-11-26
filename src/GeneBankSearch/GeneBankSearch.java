@@ -55,12 +55,30 @@ private void displayUsage(){
   * @param args Command-line arguments
   * @return Flag indicating whether the arguments are valid (true=yes)        */
 private boolean parseArguments(String[] args){
-  
-  // TODO: implement argument parser
-  
-  return false;
-}
+  try{
+    if( (args.length<3) || (args.length>5) )return false;
 
+    // parse first argument (use cache)
+    arg_useCache = new Integer(args[0]);
+    if( (arg_useCache<0) || (arg_useCache>1) )return false;
 
+    // parse second argument (BTree file)
+    arg_btreeFile = args[1];
+
+    // parse third argument (query file)
+    arg_queryFile = args[2];
+
+    // parse fourth argument (cache size)
+    if(args.length>4)arg_cacheSize = new Integer(args[4]);
+    if(arg_cacheSize<0)return false;
+    if(arg_useCache==0)arg_cacheSize = 0;
+
+    // parse fifth argument (debug level)
+    if(args.length>5)arg_debugLevel = new Integer(args[5]);
+    if( (arg_debugLevel<0) || (arg_debugLevel>1) )return false;
+
+    return true;
+  }catch(Exception e){return false;}}
+  //parseArguments()
 
 } // class GeneBankSearch
