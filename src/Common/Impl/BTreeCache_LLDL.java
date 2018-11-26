@@ -13,7 +13,6 @@ public class BTreeCache_LLDL implements BTreeCacheInterface{
     @Override public void setCacheSize(int cacheSize) {
         this.capacity = cacheSize;
         cache = new BTreeNodeInterface[cacheSize];
-        cache = java.util.Arrays.copyOf(cache,cacheSize);
     }
 
     /** Searches the cache for a node, if it exists. Returns the
