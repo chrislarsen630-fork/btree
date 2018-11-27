@@ -26,6 +26,8 @@ public class BTreeNode_Stub implements BTreeNodeInterface{
 
 @Override public int[] getChildrenIDArray(){return null;}
 
+@Override public TreeObjectInterface searchKey(TreeObjectInterface key){return null;}
+
 @Override public byte[] convertToBinaryBlob(){return null;}
 
 @Override public void convertFromBinaryBlob(byte[] blob){}
