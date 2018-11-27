@@ -55,6 +55,14 @@ public TreeObjectInterface[] getKeyArray();
 public int[] getChildrenIDArray();
 
 
+/** Searches the node for a key with a matching data value. The returned key
+  * is a direct reference to the key in the node and modification will update
+  * the value inside the node. Null if not found.
+  * @param key Key to search for.
+  * @return Reference to key with matching data.                              */
+public TreeObjectInterface searchKey(TreeObjectInterface key);
+
+
 /** Returns a binary blob of the node.
   * @return Binary version of the node.                                       */
 public byte[] convertToBinaryBlob();

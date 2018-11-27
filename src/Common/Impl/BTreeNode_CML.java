@@ -75,6 +75,16 @@ int[]                 childrenIDArray;
 // getChildrenIDArray() ========================================================
 
 
+// searchKey() =================================================================
+@Override public TreeObjectInterface searchKey(TreeObjectInterface key){
+  for(int i=0;i<nKeys;i++){
+    if(keyArray[i].compareTo(key)==0)return keyArray[i];
+  }
+  return null;
+}
+// searchKey() =================================================================
+
+
 // convertToBinaryBlob() =======================================================
 @Override public byte[] convertToBinaryBlob(){
   int keyBlobSize = AllocateC.new_TreeObject().convertToBinaryBlob().length;

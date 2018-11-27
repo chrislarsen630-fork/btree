@@ -68,13 +68,7 @@ private int cacheEntries = 0;
 @Override public void insertKey(TreeObjectInterface key) throws OmniException{
   BTreeNodeInterface node = searchKey(key);
   if(node!=null){
-    int i = 0;
-    long data = key.getData();
-    TreeObjectInterface[] nodeKeys = node.getKeyArray();
-    for(int iS=node.getNKeys();i<iS;i++){
-      if(nodeKeys[i].compareTo(key)==0)break;
-    }
-    nodeKeys[i].incrementFrequency();
+    node.searchKey(key).incrementFrequency();
     dispatchNode(node);
   }else b_tree_insert(key);
 }
