@@ -42,7 +42,7 @@ private int capacity = 0;
 // insertNode() ================================================================
 @Override public void insertNode(BTreeNodeInterface node){
   cache.addFirst(node);
-  if(cache.size()>=capacity)cache.removeLast();
+  if(cache.size()>capacity)cache.removeLast();
 }
 // insertNode() ================================================================
 
