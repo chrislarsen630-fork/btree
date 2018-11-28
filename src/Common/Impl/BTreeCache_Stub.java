@@ -2,7 +2,7 @@ package Common.Impl;
 
 import Common.*;
 
-/** Stub implementation of  BTreeCache. */
+/** Stub implementation of BTreeCache. */
 public class BTreeCache_Stub implements Common.BTreeCacheInterface{
 
 
