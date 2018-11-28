@@ -13,11 +13,11 @@ public class AllocateC{
 
 
 // Common
-public static BTreeCacheInterface new_BTreeCache(){return new BTreeCache_LLDL();}
-public static BTreeFileInterface  new_BTreeFile (){return new BTreeFile_CML  ();}
-public static BTreeInterface      new_BTree     (){return new BTree_CML      ();}
-public static BTreeNodeInterface  new_BTreeNode (){return new BTreeNode_CML  ();}
-public static TreeObjectInterface new_TreeObject(){return new TreeObject_CML ();}
+public static BTreeCacheInterface new_BTreeCache(){return new BTreeCache_CML();}
+public static BTreeFileInterface  new_BTreeFile (){return new BTreeFile_CML ();}
+public static BTreeInterface      new_BTree     (){return new BTree_CML     ();}
+public static BTreeNodeInterface  new_BTreeNode (){return new BTreeNode_CML ();}
+public static TreeObjectInterface new_TreeObject(){return new TreeObject_CML();}
 
 
 
