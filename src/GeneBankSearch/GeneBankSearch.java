@@ -1,3 +1,9 @@
+import Common.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 /** GeneBankSearch program driver class. Carries out the intended
   * purpose of the program.                                                   */
 public class GeneBankSearch{
@@ -8,6 +14,7 @@ public class GeneBankSearch{
 private int    arg_useCache;
 private String arg_btreeFile;
 private String arg_queryFile;
+private Scanner scan;
 private int    arg_cacheSize  = 0;
 private int    arg_debugLevel = 0;
 // STATE DATA ==================================================================
@@ -37,10 +44,57 @@ private void execute(String[] args){
     displayUsage();
     return;
   }
-  
-  // TODO: implement program functionality
+  try {
+    BTreeInterface tree = AllocateC.new_BTree();
+    tree.loadFromFile(arg_btreeFile);
+    queryFileRead(tree); //inside of this method, tree objects are created and inserted into tree
+  }catch(OmniException e){
+    System.out.println("AN ERROR HAS OCCURRED. ABORTING.");
+  }
 }
 
+private void queryFileRead(BTreeInterface tree){
+  try{
+    File queryFile = new File(arg_queryFile);
+    scan = new Scanner(queryFile);
+    String s;
+    BTreeNodeInterface node;
+    while (scan.hasNextLine()) {
+      s = (scan.nextLine());
+      if(s.length()>0){
+        TreeObjectInterface treeObj = createTreeObject(s);
+        node = tree.searchKey(treeObj);
+        if(node == null){
+          System.out.println(s + ": 0");
+        }else{
+          int freq = node.searchKey(treeObj).getFrequency();
+          System.out.println(s + ": " + freq);
+        }
+      }
+    }
+  }catch(FileNotFoundException | OmniException e){
+    System.out.println(e.getMessage());
+  }
+}
+
+private TreeObjectInterface createTreeObject(String line){
+
+  long data = 0;
+  for(int i=0;i<line.length();i++){
+    char c  = scan.next().charAt(i);
+    int val = 0;
+    switch(c){
+      case 'A': val = 0; break;
+      case 'C': val = 1; break;
+      case 'G': val = 2; break;
+      case 'T': val = 3; break;
+    }
+    data = (data<<2) | val;
+  }
+  TreeObjectInterface treeObj = AllocateC.new_TreeObject();
+  treeObj.setData(data);
+  return treeObj;
+}
 
 /** Prints the program usage to the standard output. Describes what the
     program does, lists expected parameters, and describes the purpose
