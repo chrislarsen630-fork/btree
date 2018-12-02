@@ -65,10 +65,9 @@ private void queryFileRead(BTreeInterface tree){
         TreeObjectInterface treeObj = createTreeObject(s);
         node = tree.searchKey(treeObj);
         if(node == null){
-          System.out.println(s + ": 0");
         }else{
           int freq = node.searchKey(treeObj).getFrequency();
-          System.out.println(s + ": " + freq);
+          System.out.println(s.toLowerCase() + ": " + freq);
         }
       }
     }
@@ -81,7 +80,7 @@ private TreeObjectInterface createTreeObject(String line){
 
   long data = 0;
   for(int i=0;i<line.length();i++){
-    char c  = scan.next().charAt(i);
+    char c  = line.charAt(i);
     int val = 0;
     switch(c){
       case 'A': val = 0; break;
