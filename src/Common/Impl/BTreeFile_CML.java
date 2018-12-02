@@ -164,15 +164,15 @@ private void writeHeader() throws OmniException{
   try{
     filePtr.seek(0);
 
-    filePtr.writeInt (MAGIC_NUMBER  );
-    filePtr.writeInt (FORMAT_VERSION);
-    filePtr.writeInt (headerSize    );
-    filePtr.writeInt (btreeDegree   );
-    filePtr.writeInt (dnaLength     );
-    filePtr.writeInt (nodeSize      );
-    filePtr.writeInt (nodePad       );
-    filePtr.writeInt (nodeCount     );
-    filePtr.writeLong(rootID        );
+    filePtr.writeInt(MAGIC_NUMBER  );
+    filePtr.writeInt(FORMAT_VERSION);
+    filePtr.writeInt(headerSize    );
+    filePtr.writeInt(btreeDegree   );
+    filePtr.writeInt(dnaLength     );
+    filePtr.writeInt(nodeSize      );
+    filePtr.writeInt(nodePad       );
+    filePtr.writeInt(nodeCount     );
+    filePtr.writeInt(rootID        );
 
   }catch(IOException e){
     throw new OmniException(
