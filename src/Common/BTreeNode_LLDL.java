@@ -3,22 +3,24 @@ package Common;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BTreeNode implements BTreeNodeInterface {
+/** A node within a BTree containing one or more keys.
+  * @author Landon Lemieux (landonlemieux@u.boisestate.edu)
+  * @author Dylan Leman    (dylanleman@u.boisestate.edu)                      */
+public class BTreeNode_LLDL{
 
 	long id;
 	boolean isLeaf;
-	List<TreeObjectInterface> keys;
+	List<TreeObject> keys;
 	List<Long> children;
 	long parentID;
 	
-	public BTreeNode() {
-		keys = new ArrayList<TreeObjectInterface>();
+	public BTreeNode_LLDL() {
+		keys = new ArrayList<TreeObject>();
 		children = new ArrayList<Long>();
 		id = 0;
 		isLeaf = true;
 	}
 	
-	@Override
 	public int compareTo(Object o) {
 		if(id <  ((BTreeNode) o).getID()) {
 			return -1;
@@ -28,7 +30,6 @@ public class BTreeNode implements BTreeNodeInterface {
 		return 0;
 	}
 
-	@Override
 	public long getID() {
 		return id;
 	}
@@ -49,22 +50,18 @@ public class BTreeNode implements BTreeNodeInterface {
 		parentID = parent;
 	}
 
-	@Override
 	public void setID(long id) {
 		this.id = id;
 	}
 
-	@Override
 	public boolean isLeaf() {
 		return children.isEmpty();
 	}
 	
-	@Override
-	public List<TreeObjectInterface> getKeys() {
+	public List<TreeObject> getKeys() {
 		return keys;
 	}
 
-	@Override
 	public List<Long> getChildrenIDs() {
 		return children;
 	}
