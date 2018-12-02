@@ -50,7 +50,7 @@ HEADER FORMAT
 -------------
 
 The header is 4096 bytes, but consists mostly of padding bytes.
-The first 40 bytes identify the file as a B-tree file and provide
+The first 36 bytes identify the file as a B-tree file and provide
 information vital to parsing the remainder of the file.
 
 
@@ -65,8 +65,8 @@ information vital to parsing the remainder of the file.
               |   20     |    int       |  nodeSize          |
               |   24     |    int       |  nodePad           |
               |   28     |    int       |  nodeCount         |
-              |   32     |    long      |  rootID            |
-              |   40     |  byte[4056]  |  reserved          |
+              |   32     |    int       |  rootID            |
+              |   36     |  byte[4060]  |  reserved          |
               +----------+--------------+--------------------+
 
 
