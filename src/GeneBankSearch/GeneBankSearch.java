@@ -14,7 +14,6 @@ public class GeneBankSearch{
 private int    arg_useCache;
 private String arg_btreeFile;
 private String arg_queryFile;
-private Scanner scan;
 private int    arg_cacheSize  = 0;
 private int    arg_debugLevel = 0;
 // STATE DATA ==================================================================
@@ -56,16 +55,14 @@ private void execute(String[] args){
 private void queryFileRead(BTreeInterface tree){
   try{
     File queryFile = new File(arg_queryFile);
-    scan = new Scanner(queryFile);
-    String s;
+    Scanner scan = new Scanner(queryFile);
     BTreeNodeInterface node;
     while (scan.hasNextLine()) {
-      s = (scan.nextLine());
+      String s = scan.nextLine();
       if(s.length()>0){
         TreeObjectInterface treeObj = createTreeObject(s);
         node = tree.searchKey(treeObj);
-        if(node == null){
-        }else{
+        if(node != null){
           int freq = node.searchKey(treeObj).getFrequency();
           System.out.println(s.toLowerCase() + ": " + freq);
         }
