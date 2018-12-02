@@ -1,11 +1,11 @@
 import Common.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
 /** GeneBankSearch program driver class. Carries out the intended
-  * purpose of the program.                                                   */
+  * purpose of the program.
+  * @author Christopher M. Larsen (chrislarsen630@u.boisestate.edu)
+  * @author Landon Lemieux (landonlemieux@u.boisestate.edu)
+  * @author Dylan Leman    (dylanleman@u.boisestate.edu)
+  * @version 20181202                                                         */
 public class GeneBankSearch{
 
 
@@ -19,6 +19,7 @@ private int    arg_debugLevel = 0;
 // STATE DATA ==================================================================
 
 
+// main() ======================================================================
 /** Program entry point. Creates an instance of the GeneBankSearch class
   * and executes it. Acts as a safety net for any unhandled exceptions thrown
   * elsewhere within the program. Do not add any code to this -- it goes in
@@ -34,8 +35,10 @@ public static void main(String[] args){
     }
   }
 }
+// main() ======================================================================
 
 
+// execute() ===================================================================
 /** Instance entry point. Carries out the intended purpose of the program.
   * @param args Command-line arguments                                        */
 private void execute(String[] args){
@@ -44,23 +47,26 @@ private void execute(String[] args){
     return;
   }
   try {
-    BTreeInterface tree = AllocateC.new_BTree();
+    BTree tree = new BTree();
     tree.loadFromFile(arg_btreeFile);
     queryFileRead(tree); //inside of this method, tree objects are created and inserted into tree
   }catch(OmniException e){
     System.out.println("AN ERROR HAS OCCURRED. ABORTING.");
   }
 }
+// execute() ===================================================================
 
-private void queryFileRead(BTreeInterface tree){
+
+// queryFileRead() =============================================================
+private void queryFileRead(BTree tree){
   try{
-    File queryFile = new File(arg_queryFile);
-    Scanner scan = new Scanner(queryFile);
-    BTreeNodeInterface node;
+    java.io.File queryFile = new java.io.File(arg_queryFile);
+    java.util.Scanner scan = new java.util.Scanner(queryFile);
+    BTreeNode node;
     while (scan.hasNextLine()) {
       String s = scan.nextLine();
       if(s.length()>0){
-        TreeObjectInterface treeObj = createTreeObject(s);
+        TreeObject treeObj = createTreeObject(s);
         node = tree.searchKey(treeObj);
         if(node != null){
           int freq = node.searchKey(treeObj).getFrequency();
@@ -68,13 +74,15 @@ private void queryFileRead(BTreeInterface tree){
         }
       }
     }
-  }catch(FileNotFoundException | OmniException e){
+  }catch(java.io.FileNotFoundException | OmniException e){
     System.out.println(e.getMessage());
   }
 }
+// queryFileRead() =============================================================
 
-private TreeObjectInterface createTreeObject(String line){
 
+// createTreeObject() ==========================================================
+private TreeObject createTreeObject(String line){
   long data = 0;
   for(int i=0;i<line.length();i++){
     char c  = line.charAt(i);
@@ -87,28 +95,31 @@ private TreeObjectInterface createTreeObject(String line){
     }
     data = (data<<2) | val;
   }
-  TreeObjectInterface treeObj = AllocateC.new_TreeObject();
-  treeObj.setData(data);
-  return treeObj;
+  return new TreeObject(data);
 }
+// createTreeObject() ==========================================================
 
+
+// displayUsage() ==============================================================
 /** Prints the program usage to the standard output. Describes what the
     program does, lists expected parameters, and describes the purpose
     of each parameter.                                                        */
 private void displayUsage(){
   System.out.println("Usage: java GeneBankSearch <use_cache> <btree_file> <query_file> [<cache_size>] [<debug_level>]");
-  System.out.println("Searches a BTree file for sequences of a given length.");
-  System.out.println(                                                        );
-  System.out.println("PARAMETERS"                                            );
-  System.out.println("  use_cache        Use disk cache (0=no, 1=yes)"       );
-  System.out.println("  btree_file       File path to BTree file"            );
-  System.out.println("  query_file       File path to DNA sequence file"     );
-  System.out.println("  cache_size       Size of the cache (in entries)"     );
-  System.out.println("  debug_level      Create dump file (0=no, 1=yes)"     );
-  System.out.println(                                                        );
+  System.out.println("Searches a BTree file for sequences of a given length." );
+  System.out.println(                                                         );
+  System.out.println("PARAMETERS"                                             );
+  System.out.println("  use_cache    Use disk cache (0=no, 1=yes)"            );
+  System.out.println("  btree_file   File path to BTree file"                 );
+  System.out.println("  query_file   File path to DNA sequence file"          );
+  System.out.println("  cache_size   Size of the cache (in entries)"          );
+  System.out.println("  debug_level  Create dump file (0=no, 1=yes)"          );
+  System.out.println(                                                         );
 }
+// displayUsage() ==============================================================
 
 
+// parseArguments() ============================================================
 /** Parses the command-line arguments. Returns false if insufficient or
   * invalid arguments are provided.
   * @param args Command-line arguments
@@ -138,7 +149,8 @@ private boolean parseArguments(String[] args){
 
     return true;
   }catch(Exception e){return false;}
-} //parseArguments()
+}
+// parseArguments() ============================================================
 
 
 

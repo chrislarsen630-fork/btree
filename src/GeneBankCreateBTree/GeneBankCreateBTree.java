@@ -1,5 +1,4 @@
 import Common.*;
-import CreateBTree.*;
 
 /** GeneBankCreateBTree program driver class. Carries out the intended
   * purpose of the program.                                                   */
@@ -7,25 +6,12 @@ public class GeneBankCreateBTree{
 
 
 
-// DEBUG SETTINGS ==============================================================
-private final boolean DEBUG_DEBUGTESTS                       = false;
-private final int     DEBUG_DEBUGTESTS_BTREEDEGREE           = 64;
-private final int     DEBUG_DEBUGTESTS_SEQUENCELENGTH        = 6;
-private final boolean DEBUG_DEBUGTESTS_GENEBANKFILE          = false;
-private final String  DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME = "test3.gbk";
-private final boolean DEBUG_DEBUGTESTS_TREEOBJECT            = false;
-private final boolean DEBUG_DEBUGTESTS_BTREENODE             = false;
-private final boolean DEBUG_DEBUGTESTS_BTREE                 = false;
-private final boolean DEBUG_DEBUGTESTS_GENEBANKFILEPLUSBTREE = false;
-// DEBUG SETTINGS ==============================================================
-
-
 // STATE DATA ==================================================================
 int    arg_useCache;
 int    arg_btreeDegree;
 String arg_gbkFile;
 int    arg_sequenceLength;
-int    arg_cacheSize = 0;
+int    arg_cacheSize  = 0;
 int    arg_debugLevel = 0;
 // STATE DATA ==================================================================
 
@@ -56,11 +42,6 @@ public static void main(String[] args){
 /** Instance entry point. Carries out the intended purpose of the program.
   * @param args Command-line arguments                                        */
 private void execute(String[] args){
-  if(DEBUG_DEBUGTESTS){
-    doDebugTests();
-    return;
-  }
-
   long performanceTimer = System.currentTimeMillis();
   
   if(!parseArguments(args)){
@@ -87,7 +68,7 @@ private void execute(String[] args){
   System.out.println(                                                         );
 
   System.out.print("Parsing GBK file...");
-  GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
+  GeneBankFile geneFile = new GeneBankFile();
   try{
     geneFile.loadFromFile(arg_gbkFile,arg_sequenceLength);
   }catch(OmniException e){
@@ -97,10 +78,10 @@ private void execute(String[] args){
   System.out.println("OK.");
 
   System.out.print("Initializing BTree...");
-  BTreeInterface tree = AllocateC.new_BTree();
+  BTree tree = new BTree();
   try{
     tree.createNewFile(btreeFileName,arg_btreeDegree,arg_sequenceLength);
-    tree.setCacheSize(arg_cacheSize);
+    tree.setCacheCapacity(arg_cacheSize);
   }catch(OmniException e){
     System.out.println("FAILED. Aborting.");
     return;
@@ -113,14 +94,12 @@ private void execute(String[] args){
       for(int i=0;!geneFile.isSubsequenceDone();i++){
         if((i%32768==0)&&(i>0))System.out.print(".");
         long data = geneFile.readData();
-        TreeObjectInterface key = AllocateC.new_TreeObject();
-        key.setData(data);
-        tree.insertKey(key);
+        tree.insertKey(new TreeObject(data));
       }
     }while(geneFile.nextSubsequence());
   }catch(OmniException e){
     System.out.println();
-    System.out.println("Encountered an error while parsing GBK file. Aborting,");
+    System.out.println("Encountered an error. Aborting.");
     return;
   }
   System.out.println();
@@ -129,7 +108,7 @@ private void execute(String[] args){
   if(arg_debugLevel==1){
     try{
       System.out.print("Writing debug dump file...");
-      DebugFileDumperInterface dumper = AllocateB.new_DebugFileDumper();
+      DebugFileDumper dumper = new DebugFileDumper();
       dumper.dumpBTreeToFile(tree,arg_gbkFile+".btree.dump."+arg_sequenceLength,arg_sequenceLength);
       System.out.println("OK.");
     }catch(OmniException e){System.out.println("FAILED.");}
@@ -209,138 +188,19 @@ private boolean parseArguments(String[] args){
   * @return Optimal BTree degree.                                             */
 private int getOptimalBTreeDegree(int pageSize){
   int lastGoodDegree = 2;
-  
+
   // Not the most elegant approach, but the most reliable.
-  BTreeNodeInterface node = AllocateC.new_BTreeNode();
+  BTreeNode node = new BTreeNode();
   for(int i=3;i<=pageSize;i++){
     node.setDegree(i);
-    node.inflateToMaximumSize();
     byte[] nodeBlob = node.convertToBinaryBlob();
     if(nodeBlob.length>pageSize)break;
     lastGoodDegree = i;
   }
-  
+
   return lastGoodDegree;
 }
 // getOptimalBTreeDegree() =====================================================
-
-
-// doDebugTest() ===============================================================
-/** Temporary test routines to check that the classes are functioning
-  * correctly. Ideally these should be unit tests, but I'm lazy.
-  * Delete prior to submission.                                               */
-private void doDebugTests(){
-  if(DEBUG_DEBUGTESTS_GENEBANKFILE){
-    System.out.println("GENEBANKFILE_________________________________________");
-    GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
-    try{
-      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,1);
-      do{
-        for(int i=0;!geneFile.isSubsequenceDone();i++){
-          if(i%60==0&&i>0)System.out.println();
-          System.out.print(geneFile.readData()+" ");
-        }
-        System.out.println();
-        System.out.println();
-      }while(geneFile.nextSubsequence());
-    }catch(Exception e){throw new RuntimeException(e.getMessage());}
-  }
-
-  if(DEBUG_DEBUGTESTS_TREEOBJECT){
-    System.out.println("TREEOBJECT___________________________________________");
-    TreeObjectInterface obj = AllocateC.new_TreeObject();
-    obj.setData(0x12345678);
-    byte[] blob = obj.convertToBinaryBlob();
-    for(int i=0;i<blob.length;i++)System.out.print(String.format("0x%02X ",blob[i]));
-    System.out.println();
-    
-    TreeObjectInterface obj2 = AllocateC.new_TreeObject();
-    obj2.convertFromBinaryBlob(blob);
-    System.out.println(String.format("0x%08X",obj2.getData()));
-    System.out.println(obj2.getFrequency());
-    
-    System.out.println();
-    System.out.println();
-  }
-  
-  if(DEBUG_DEBUGTESTS_BTREENODE){
-    System.out.println("BTREENODE____________________________________________");
-    BTreeNodeInterface node = AllocateC.new_BTreeNode();
-    node.setDegree(DEBUG_DEBUGTESTS_BTREEDEGREE);
-    node.setNKeys(4);
-    node.getKeyArray()[0].setData(11111111);
-    node.getKeyArray()[1].setData(22222222);
-    node.getKeyArray()[2].setData(33333333);
-    node.getChildrenIDArray()[0] = 44444444;
-    node.getChildrenIDArray()[1] = 55555555;
-    node.getChildrenIDArray()[2] = 66666666;
-    node.getChildrenIDArray()[3] = 77777777;
-    System.out.println(""+node.getNKeys());
-    for(int i=0;i<3;i++)System.out.print(""+node.getKeyArray()[i].getData()+" ");
-    System.out.println();
-    for(int i=0;i<4;i++)System.out.print(""+node.getChildrenIDArray()[i]+" ");
-    System.out.println();
-    System.out.println();
-  
-    byte[] blob = node.convertToBinaryBlob();
-
-    BTreeNodeInterface eckas = AllocateC.new_BTreeNode();
-    eckas.setDegree(DEBUG_DEBUGTESTS_BTREEDEGREE);
-    eckas.convertFromBinaryBlob(blob);
-    System.out.println(""+eckas.getNKeys());
-    for(int i=0;i<3;i++)System.out.print(""+eckas.getKeyArray()[i].getData()+" ");
-    System.out.println();
-    for(int i=0;i<4;i++)System.out.print(""+eckas.getChildrenIDArray()[i]+" ");
-    System.out.println();
-    System.out.println();
-  }
-  
-  if(DEBUG_DEBUGTESTS_BTREE){
-    try{
-      BTreeInterface tree = AllocateC.new_BTree();
-      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
-      char[] keyArray = {'a','j','i','b','c','h','g','d','e','f'};
-      for(int i=0;i<keyArray.length;i++){
-        TreeObjectInterface key = AllocateC.new_TreeObject();
-        key.setData(keyArray[i]);
-        tree.insertKey(key);
-      }
-      for(int i=0;i<keyArray.length;i++){
-        TreeObjectInterface key = AllocateC.new_TreeObject();
-        key.setData(keyArray[i]);
-        BTreeNodeInterface n = tree.searchKey(key);
-        System.out.print(n.getID()+" : ");
-        for(int j=0,jS=n.getNKeys();j<jS;j++)System.out.print(""+(char)n.getKeyArray()[j].getData()+" ");
-        System.out.println(n.isLeaf()?" leaf":" nonleaf");
-      }
-    }catch(OmniException e){System.out.println("THREW EXCEPTION");}
-  }
-  
-  if(DEBUG_DEBUGTESTS_GENEBANKFILEPLUSBTREE){
-    try{
-      BTreeInterface tree = AllocateC.new_BTree();
-      tree.createNewFile("TestFile.bin",DEBUG_DEBUGTESTS_BTREEDEGREE,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
-      
-      GeneBankFileInterface geneFile = AllocateB.new_GeneBankFile();
-      geneFile.loadFromFile(DEBUG_DEBUGTESTS_GENEBANKFILE_FILENAME,DEBUG_DEBUGTESTS_SEQUENCELENGTH);
-      do{
-        for(int i=0;!geneFile.isSubsequenceDone();i++){
-          if(i%60==0&&i>0)System.out.println();
-          long data = geneFile.readData();
-          System.out.print(data+" ");
-          TreeObjectInterface key = AllocateC.new_TreeObject();
-          key.setData(data);
-          tree.insertKey(key);          
-        }
-        System.out.println();
-        System.out.println();
-      }while(geneFile.nextSubsequence());
-      DebugFileDumperInterface dump = AllocateB.new_DebugFileDumper();
-      dump.dumpBTreeToFile(tree,"blah.txt",DEBUG_DEBUGTESTS_SEQUENCELENGTH);
-    }catch(OmniException e){System.out.println("THREW EXCEPTION");}
-  }
-}
-// doDebugTest() ===============================================================
 
 
 

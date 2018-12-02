@@ -1,29 +1,48 @@
-package CreateBTree.Impl;
-
 import java.util.*;
 import java.io.*;
 import java.nio.file.*;
-import CreateBTree.GeneBankFileInterface;
 import Common.*;
 
-/** Chris's implementation of GeneBankFile. */
-public class GeneBankFile_CML implements GeneBankFileInterface{
+/** Parses a GeneBank file and converts the DNA sequences contained therein
+  * into a packed binary format.                                              */
+public class GeneBankFile{
 
 
 
 // STATE DATA ==================================================================
-private Scanner  parser;
+private Scanner parser;
 
 private String[] buffer;
 private String   mergedBuffer;
 private int      mergedBufferIndex = 0;
 
 private int dataWindowSize = 0;
+
+// look up tables
+final private boolean[] END_CHARACTER = new boolean[256];
+final private int[]     BASE_TO_VAL   = new int    [256];
 // STATE DATA ==================================================================
 
 
+// GeneBankFile() ==============================================================
+public GeneBankFile(){
+  END_CHARACTER[0x4E] = END_CHARACTER[0x6E] = true;
+
+  for(int i=0;i<256;i++)BASE_TO_VAL[i] = 4;
+  BASE_TO_VAL[0x41] = BASE_TO_VAL[0x61] = 0;
+  BASE_TO_VAL[0x43] = BASE_TO_VAL[0x63] = 1;
+  BASE_TO_VAL[0x47] = BASE_TO_VAL[0x67] = 2;
+  BASE_TO_VAL[0x54] = BASE_TO_VAL[0x74] = 3;
+}
+// GeneBankFile() ==============================================================
+
+
 // loadFromFile() ==============================================================
-@Override
+/** Associates the GeneBankFileInterface object with a file and sets the file
+  * parser to the beginning of the DNA sequence.
+  * @param file GeneBank file to load.                                        
+  * @param windowSize Number of DNA bases to load during readData().
+  * @throws Common.OmniException on file access or read error.                */
 public void loadFromFile(String file,int windowSize) throws OmniException{
   dataWindowSize = windowSize;
 
@@ -47,10 +66,13 @@ public void loadFromFile(String file,int windowSize) throws OmniException{
 
 
 // isSubsequenceDone() =========================================================
-@Override public boolean isSubsequenceDone(){
+/** Indicates whether the file parser is at the end of the current DNA
+  * subsequence.
+  * @return True if the subsequence is done.                                  */
+public boolean isSubsequenceDone(){
   if(mergedBufferIndex+dataWindowSize>mergedBuffer.length())return true;
   for(int i=0;i<dataWindowSize;i++){
-    if(mergedBuffer.charAt(mergedBufferIndex+i)=='N')return true;
+    if(END_CHARACTER[mergedBuffer.charAt(mergedBufferIndex+i)])return true;
   }
   return false;
 }
@@ -58,22 +80,24 @@ public void loadFromFile(String file,int windowSize) throws OmniException{
 
 
 // readData() ==================================================================
-@Override public long readData() throws OmniException{
+/** Reads the data at the file parser and packs it into a binary
+  * representation. Each two bits represents a DNA base (0b00=A, 0b01=C,
+  * 0b10=G, 0b11=T). The number of DNA bases read is determined by the
+  * windowSize set in loadFromFile(). The bases are packed so that the base
+  * that was read last is contained in the two least significant bits; for
+  * instance, the sequence ACGT is represented as 0b00011011.
+  * @return Packed binary representation of data.
+  * @throws Common.OmniException on file access or read error.                */
+public long readData() throws OmniException{
   long ret = 0;
 
   try{
     for(int i=0;i<dataWindowSize;i++){
       char c  = mergedBuffer.charAt(mergedBufferIndex+i);
-      int val = 0;
-      switch(c){
-        case 'A': val = 0; break;
-        case 'C': val = 1; break;
-        case 'G': val = 2; break;
-        case 'T': val = 3; break;
-        default: throw new OmniException(
-          OmniException.FILE_READ_ERROR,"Read malformed data in source file."
-        );
-      }
+      int val = BASE_TO_VAL[c];
+      if(val==4){System.out.println("!"+c+"!");throw new OmniException(
+        OmniException.FILE_READ_ERROR,"Read malformed data in source file."
+      );}
       ret = (ret<<2) | val;
     }
     incrementBufferIndex();
@@ -89,11 +113,15 @@ public void loadFromFile(String file,int windowSize) throws OmniException{
 
 
 // nextSubsequence() ===========================================================
-@Override public boolean nextSubsequence() throws OmniException{
- if(!isSubsequenceDone())throw new OmniException();
+/** Sets the file parser to the beginning of the next DNA subsequence.
+  * Returns true if the next subsequence exists, otherwise returns false.
+  * @return Whether a new subsequence has been loaded.
+  * @throws Common.OmniException if there are no more subsequences.           */
+public boolean nextSubsequence() throws OmniException{
+  if(!isSubsequenceDone())throw new OmniException();
   try{
-    while(mergedBuffer.charAt(mergedBufferIndex)!='N')incrementBufferIndex();
-    while(mergedBuffer.charAt(mergedBufferIndex)=='N')incrementBufferIndex();
+    while(!END_CHARACTER[mergedBuffer.charAt(mergedBufferIndex)])incrementBufferIndex();
+    while( END_CHARACTER[mergedBuffer.charAt(mergedBufferIndex)])incrementBufferIndex();
     return (mergedBuffer.length()>0);
   }catch(Exception e){return false;}
 }
@@ -136,12 +164,12 @@ private File createFlatFile(String sourceFile) throws OmniException{
           try(Scanner originReader = new Scanner(originData)){
             originReader.nextInt();
             while(originReader.hasNext()){
-              outData.write(originReader.next().toUpperCase());
+              outData.write(originReader.next());
             }
             outData.newLine();
           } // Scanner originReader
         } // for(nLines)
-        
+
         // write a line of subsequence-break characters
         outData.write("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
         outData.newLine();
@@ -180,4 +208,4 @@ private void incrementBufferIndex(){
 
 
 
-} // class GeneBankFile_CML
+} // class GeneBankFile
