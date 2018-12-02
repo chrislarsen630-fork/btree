@@ -1,10 +1,12 @@
-package Common.Impl;
+package Common;
 
 import java.io.*;
-import Common.*;
 
-/** Chris's implementation of BTreeFile. */
-public class BTreeFile_CML implements BTreeFileInterface{
+/** BTree file I/O. Intended for internal use by BTree. No other code should
+  * touch it.
+  * @author Christopher M. Larsen (chrislarsen630@u.boisestate.edu)
+  * @version 20181202                                                         */
+public class BTreeFile{
 
 
 
@@ -29,8 +31,14 @@ private int rootID      = 0;
 
 
 // createNewFile() =============================================================
-@Override public BTreeNodeInterface createNewFile(
-  String targetFile,int degree,int sequenceLength)
+/** Creates a new BTree file. Called by BTreeInterface.createNewFile().
+  * @param targetFile File path for the created file. If the file exists,
+  *                   it will be overwritten.
+  * @param degree         Degree of the BTree.
+  * @param sequenceLength Length of DNA sequences, in base pairs.
+  * @return Root node of the BTree.
+  * @throws OmniException on file creation error.                             */
+public BTreeNode createNewFile(String targetFile,int degree,int sequenceLength)
 throws OmniException{
   btreeDegree = degree;
   dnaLength   = sequenceLength;
@@ -43,9 +51,8 @@ throws OmniException{
   }
 
   // determine maximum node size
-  BTreeNodeInterface dummyNode = AllocateC.new_BTreeNode();
+  BTreeNode dummyNode = new BTreeNode();
   dummyNode.setDegree(degree);
-  dummyNode.inflateToMaximumSize();
   nodeSize = dummyNode.convertToBinaryBlob().length;
   if( (nodeSize<4096) && (4096-nodeSize<64)){
     nodePad = 4096 - nodeSize;
@@ -63,7 +70,7 @@ throws OmniException{
 
   // create root node
   rootID = allocateNode().getID();
-  BTreeNodeInterface ret = readNode(rootID);
+  BTreeNode ret = readNode(rootID);
   ret.setLeaf(true);
   writeNode(ret);
   return ret;
@@ -72,7 +79,12 @@ throws OmniException{
 
 
 // loadFromFile() ==============================================================
-@Override public BTreeNodeInterface loadFromFile(String sourceFile) throws OmniException{
+/** Loads an existing BTree file from disk. Called by
+  * BTreeInterface.loadFromFile().
+  * @param sourceFile File path to load the BTree from.
+  * @return Root node of the BTree.
+  * @throws OmniException on file access or read error.                       */
+public BTreeNode loadFromFile(String sourceFile) throws OmniException{
   try{
     filePtr = new RandomAccessFile(sourceFile,"rw");
     readHeader();
@@ -85,12 +97,18 @@ throws OmniException{
 
 
 // getSequenceLength() =========================================================
-@Override public int getSequenceLength(){return dnaLength;}
+/** Returns the length of the DNA sequences.
+  * @return DNA sequence length.                                              */
+public int getSequenceLength(){return dnaLength;}
 // getSequenceLength() =========================================================
 
 
 // readNode() ==================================================================
-@Override public BTreeNodeInterface readNode(int nodeID) throws OmniException{
+/** Loads the node with the specified ID from disk.
+  * @param nodeID ID of the node to read.
+  * @return BTree node.
+  * @throws OmniException if node does not exist or on read error.            */
+public BTreeNode readNode(int nodeID) throws OmniException{
   if( (nodeID<1) || (nodeID>nodeCount) ){
     throw new RuntimeException("Invalid node ID in BTree read.");
   }
@@ -99,7 +117,7 @@ throws OmniException{
     byte[] blob = new byte[nodeSize];
     filePtr.seek(headerSize + ((nodeID-1) * nodeTotal));
     filePtr.read(blob);
-    BTreeNodeInterface node = AllocateC.new_BTreeNode();
+    BTreeNode node = new BTreeNode();
     node.setDegree(btreeDegree);
     node.setID(nodeID);
     node.convertFromBinaryBlob(blob);
@@ -114,14 +132,17 @@ throws OmniException{
 
 
 // allocateNode() ==============================================================
-@Override public BTreeNodeInterface allocateNode() throws OmniException{
+/** Allocates space for a new BTree node and returns the newly created node.
+  * @return A newly allocated node.
+  * @throws OmniException if a new node cannot be allocated.                  */
+public BTreeNode allocateNode() throws OmniException{
   try{
     // calculate file position
     int pos = headerSize + (nodeCount * nodeTotal);
 
     // write node
     filePtr.seek(pos);
-    BTreeNodeInterface node = AllocateC.new_BTreeNode();
+    BTreeNode node = new BTreeNode();
     node.setID    (nodeCount+1);
     node.setDegree(btreeDegree);
     filePtr.seek(pos);
@@ -141,7 +162,10 @@ throws OmniException{
 
 
 // writeNode() =================================================================
-@Override public void writeNode(BTreeNodeInterface node) throws OmniException{
+/** Saves a node to disk.
+ * @param node Node to write.
+ * @throws OmniException on file write error.                                 */
+public void writeNode(BTreeNode node) throws OmniException{
   long id = node.getID();
   if( (id<1) || (id>nodeCount) ){
     throw new RuntimeException("Invalid node ID in BTree write.");
@@ -157,6 +181,25 @@ throws OmniException{
   }
 }
 // writeNode() =================================================================
+
+
+// setRootNode() ===============================================================
+/** Sets the ID of the root node.
+  * @param nodeID ID of the root node.                                        */
+public void setRootNode(int nodeID){
+  if( (nodeID<1) || (nodeID>nodeCount) ){
+    throw new RuntimeException("Invalid node ID set for BTree root node.");
+  }
+  rootID = nodeID;
+  try{writeHeader();}catch(OmniException e){}
+}
+// setRootNode() ===============================================================
+
+
+// close() =====================================================================
+/** Closes the file stream and deallocates resources.                         */
+public void close(){try{filePtr.close();}catch(IOException e){}}
+// close() =====================================================================
 
 
 // writeHeader() ===============================================================
@@ -214,21 +257,5 @@ private void readHeader() throws OmniException{
 // readHeader() ================================================================
 
 
-// setRootNode() ===============================================================
-@Override public void setRootNode(int nodeID){
-  if( (nodeID<1) || (nodeID>nodeCount) ){
-    throw new RuntimeException("Invalid node ID set for BTree root node.");
-  }
-  rootID = nodeID;
-  try{writeHeader();}catch(OmniException e){}
-}
-// setRootNode() ===============================================================
 
-
-// close() =====================================================================
-@Override public void close(){try{filePtr.close();}catch(IOException e){}}
-// close() =====================================================================
-
-
-
-} // class BTreeFile_CML
+} // class BTreeFile

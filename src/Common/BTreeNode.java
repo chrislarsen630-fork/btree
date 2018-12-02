@@ -1,10 +1,11 @@
-package Common.Impl;
+package Common;
 
-import Common.*;
 import java.util.*;
 
-/** Chris's implementation of BTreeNode. */
-public class BTreeNode_CML implements BTreeNodeInterface{
+/** A node within a BTree containing one or more keys.
+  * @author Christopher M. Larsen (chrislarsen630@u.boisestate.edu)
+  * @version 20181202                                                         */
+public class BTreeNode{
 
 
 
@@ -14,14 +15,16 @@ int nodeID      = 0;
 int maxChildren = 0;
 int maxKeys     = 0;
 int nKeys       = 0;
-boolean               leafFlag;
-TreeObjectInterface[] keyArray;
-int[]                 childrenIDArray;
+boolean      leafFlag;
+TreeObject[] keyArray;
+int[]        childrenIDArray;
 // STATE DATA ==================================================================
 
 
 // setDegree() =================================================================
-@Override public void setDegree(int degree){
+/** Sets the BTree degree of the node.
+  * @param degree Degree value.                                               */
+public void setDegree(int degree){
   if(degree<2)throw new RuntimeException("Invalid BTree degree size.");
   
   btreeDegree = degree;
@@ -29,54 +32,80 @@ int[]                 childrenIDArray;
   maxKeys     = (degree*2)-1;
   
   childrenIDArray = new int[maxChildren];
-  keyArray        = new TreeObjectInterface[maxKeys];
-  for(int i=0;i<maxKeys;i++)keyArray[i] = AllocateC.new_TreeObject();
+  keyArray        = new TreeObject[maxKeys];
+  for(int i=0;i<maxKeys;i++)keyArray[i] = new TreeObject();
 }
 // setDegree() =================================================================
 
 
 // getID() =====================================================================
-@Override public int getID(){return nodeID;}
+/** Returns the node's ID number.
+  * @return Node ID number.                                                   */
+public int getID(){return nodeID;}
 // getID() =====================================================================
 
 
 // setID() =====================================================================
-@Override public void setID(int id){nodeID = id;}
+/** Sets the node's ID number.
+  * @param id ID number, as allocated by BTreeFileInterface.                  */
+public void setID(int id){nodeID = id;}
 // setID() =====================================================================
 
 
 // isLeaf() ====================================================================
-@Override public boolean isLeaf(){return leafFlag;}
+/** Indicates whether the node is a leaf on its tree.
+  * @return True if the node is a leaf.                                       */
+public boolean isLeaf(){return leafFlag;}
 // isLeaf() ====================================================================
 
 
 // setLeaf() ===================================================================
-@Override public void setLeaf(boolean value){leafFlag = value;}
+/** Sets whether this node is a leaf or not.
+  * @param value Boolean value indicating whether the node is a leaf.         */
+public void setLeaf(boolean value){leafFlag = value;}
 // setLeaf() ===================================================================
 
 
 // getNKeys() ==================================================================
-@Override public int getNKeys(){return nKeys;}
+/** Returns the number of active keys stored in this node.
+  * @return Number of keys stored in node.                                    */
+public int getNKeys(){return nKeys;}
 // getNKeys() ==================================================================
 
 
 // setNKeys() ==================================================================
-@Override public void setNKeys(int value){nKeys = value;}
+/** Sets the number of active keys stored in this node.
+  * @param value Number of keys stored in node.                               */
+public void setNKeys(int value){nKeys = value;}
 // setNKeys() ==================================================================
 
 
 // getKeyArray() ===============================================================
-@Override public TreeObjectInterface[] getKeyArray(){return keyArray;}
+/** Returns the array containing the keys. Note that the actual array size is
+  * fixed and may be larger than the number of active keys; hence getNKeys()
+  * should be used to determine the array size rather than the array's
+  * .length member.
+  * @return Array containing the keys stored in this node.                    */
+public TreeObject[] getKeyArray(){return keyArray;}
 // getKeyArray() ===============================================================
 
 
 // getChildrenIDArray() ========================================================
-@Override public int[] getChildrenIDArray(){return childrenIDArray;}
+/** Returns the array containing the IDs of this node's children. Note that
+  * the actual array size is fixed and may be larger than the number of
+  * active keys.
+  * @return Array containing the IDs of this node's children.                 */
+public int[] getChildrenIDArray(){return childrenIDArray;}
 // getChildrenIDArray() ========================================================
 
 
 // searchKey() =================================================================
-@Override public TreeObjectInterface searchKey(TreeObjectInterface key){
+/** Searches the node for a key with a matching data value. The returned key
+  * is a direct reference to the key in the node and modification will update
+  * the value inside the node. Null if not found.
+  * @param key Key to search for.
+  * @return Reference to key with matching data.                              */
+public TreeObject searchKey(TreeObject key){
   for(int i=0;i<nKeys;i++){
     if(keyArray[i].compareTo(key)==0)return keyArray[i];
   }
@@ -86,9 +115,11 @@ int[]                 childrenIDArray;
 
 
 // convertToBinaryBlob() =======================================================
-@Override public byte[] convertToBinaryBlob(){
-  int keyBlobSize = AllocateC.new_TreeObject().convertToBinaryBlob().length;
-  
+/** Returns a binary blob of the node.
+  * @return Binary version of the node.                                       */
+public byte[] convertToBinaryBlob(){
+  int keyBlobSize = (new TreeObject()).convertToBinaryBlob().length;
+
   byte[] blob = new byte[4 + maxKeys*keyBlobSize + maxChildren*4 + 1];
   
   int offset = 0;
@@ -97,7 +128,7 @@ int[]                 childrenIDArray;
   offset += 4;
   
   for(int j=0;j<maxKeys;j++){
-    TreeObjectInterface key = keyArray[j];
+    TreeObject key = keyArray[j];
     byte[] keyBlob = key.convertToBinaryBlob();
     System.arraycopy(keyBlob,0,blob,offset,keyBlobSize);
     offset += keyBlobSize;
@@ -117,8 +148,10 @@ int[]                 childrenIDArray;
 
 
 // convertFromBinaryBlob() =====================================================
-@Override public void convertFromBinaryBlob(byte[] blob){
-  int keyBlobSize = AllocateC.new_TreeObject().convertToBinaryBlob().length;
+/** Loads this node from a binary blob.
+  * @param blob Binary data containing node.                                  */
+public void convertFromBinaryBlob(byte[] blob){
+  int keyBlobSize = (new TreeObject()).convertToBinaryBlob().length;
 
   int offset = 0;
   
@@ -130,7 +163,7 @@ int[]                 childrenIDArray;
   
   for(int j=0;j<maxKeys;j++){
     byte[] keyBlob = Arrays.copyOfRange(blob,offset,offset+keyBlobSize);
-    TreeObjectInterface keyObj = AllocateC.new_TreeObject();
+    TreeObject keyObj = new TreeObject();
     keyObj.convertFromBinaryBlob(keyBlob);
     keyArray[j] = keyObj;
     offset += keyBlobSize;
@@ -150,13 +183,5 @@ int[]                 childrenIDArray;
 // convertFromBinaryBlob() =====================================================
 
 
-// inflateToMaximumSize() ======================================================
-@Override public void inflateToMaximumSize(){
-  for(int i=0;i<keyArray.length;i++)keyArray[i] = AllocateC.new_TreeObject();
-  for(int i=0;i<childrenIDArray.length;i++)childrenIDArray[i] = i;
-}
-// inflateToMaximumSize() ======================================================
 
-
-
-} // class BTreeNode_CML
+} // class BTreeNode

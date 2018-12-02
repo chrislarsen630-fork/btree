@@ -1,9 +1,9 @@
-package Common.Impl;
+package Common;
 
-import Common.*;
-
-/** Chris's implementation of TreeObject.                                     */
-public class TreeObject_CML implements TreeObjectInterface{
+/** Data packet contained within a BTree node.
+  * @author Christopher M. Larsen (chrislarsen630@u.boisestate.edu)
+  * @version 20181202                                                         */
+public class TreeObject{
 
 
 
@@ -13,31 +13,48 @@ private int  frequency = 0;
 // STATE DATA ==================================================================
 
 
+// TreeObject() ================================================================
+public TreeObject(){}
+
+public TreeObject(long value){
+  data      = value;
+  frequency = 1;
+}
+// TreeObject() ================================================================
+
+
 // getData() ===================================================================
-@Override public long getData(){return data;}
+/** Returns the data contained within the tree object.
+  * @return Data contained in the object.                                     */
+public long getData(){return data;}
 // getData() ===================================================================
 
 
 // setData() ===================================================================
-@Override public void setData(long value){
-  data = value;
+/** Sets the data contained within the tree object.
+ * @param value Data value to set.                                            */
+public void setData(long value){
+  data      = value;
   frequency = 1;
 }
 // setData() ===================================================================
 
 
 // getFrequency() ==============================================================
-@Override public int getFrequency(){return frequency;}
+/** Returns the number of duplicate insertions.
+  * @return frequency value                                                   */
+public int getFrequency(){return frequency;}
 // getFrequency() ==============================================================
 
 
 // incrementFrequency() ========================================================
-@Override public void incrementFrequency(){frequency++;}
+/** Increases the frequency count when a duplicate insertion is detected.     */
+public void incrementFrequency(){frequency++;}
 // incrementFrequency() ========================================================
 
 
 // compareTo() =================================================================
-@Override public int compareTo(TreeObjectInterface obj){
+public int compareTo(TreeObject obj){
   if(obj==null)return 1;
 
   long targetData = obj.getData();
@@ -49,7 +66,9 @@ private int  frequency = 0;
 
 
 // convertToBinaryBlob() =======================================================
-@Override public byte[] convertToBinaryBlob(){
+/** Returns a binary blob of the tree object.
+  * @return Binary version of the tree object.                                */
+public byte[] convertToBinaryBlob(){
   byte[] blob = new byte[12];
   for(int i=0;i<8;i++)blob[i  ] = (byte)((data     >>((7-i)*8)) & 0xFF);
   for(int i=0;i<4;i++)blob[i+8] = (byte)((frequency>>((3-i)*8)) & 0xFF);
@@ -59,20 +78,18 @@ private int  frequency = 0;
 
 
 // convertFromBinaryBlob() =====================================================
-@Override public void convertFromBinaryBlob(byte[] blob){
+/** Loads this tree object from a binary blob.
+  * @param blob Binary data containing tree object.                           */
+public void convertFromBinaryBlob(byte[] blob){
   data      = 0;
   frequency = 0;
 
-  for(int i=0;i<8;i++){
-    data |= (((long)blob[i])&0xFF) << ((7-i)*8);
-  }
+  for(int i=0;i<8;i++)data      |= (((long)blob[i  ])&0xFF) << ((7-i)*8);
+  for(int i=0;i<4;i++)frequency |= (((int )blob[i+8])&0xFF) << ((3-i)*8);
 
-  for(int i=0;i<4;i++){
-    frequency |= (((int)blob[i+8])&0xFF) << ((3-i)*8);
-  }
 }
 // convertFromBinaryBlob() =====================================================
 
 
 
-} // class TreeObject_CML
+} // class TreeObject

@@ -1,17 +1,22 @@
-package CreateBTree.Impl;
-
 import java.util.*;
 import java.io.*;
 import Common.*;
-import CreateBTree.DebugFileDumperInterface;
 
-/** Chris's implementation of DebugFileDumper. */
-public class DebugFileDumper_CML implements DebugFileDumperInterface{
+/** Debug file dumper interface for dumping the contents of a BTree to file.
+  * Used when GeneBankCreateBTree has a debug level of 1.
+  * @author Christopher M. Larsen (chrislarsen630@u.boisestate.edu)
+  * @version 20181202                                                         */
+public class DebugFileDumper{
 
 
 
 // dumpBTreeToFile() ===========================================================
-@Override public void dumpBTreeToFile(BTreeInterface tree,String file,int sequenceLength)
+/** Dumps the BTree to file.
+ * @param tree BTree to dump.
+ * @param file File path of the target file.
+ * @param sequenceLength Length of DNA sequences, in base pairs.
+ * @throws Common.OmniException on file access or read error.                 */
+public void dumpBTreeToFile(BTree tree,String file,int sequenceLength)
 throws OmniException{
   final char[] VAL_TO_BASEPAIR = new char[4];
   VAL_TO_BASEPAIR[0] = 'a';
@@ -22,7 +27,7 @@ throws OmniException{
   try(BufferedWriter outData = new BufferedWriter(new FileWriter(file))){
     Stack<Integer> parentIDStack    = new java.util.Stack<>();
     Stack<Integer> parentIndexStack = new java.util.Stack<>();
-    BTreeNodeInterface node = tree.getRootNode();
+    BTreeNode node = tree.getRootNode();
     while(!node.isLeaf()){
       parentIDStack   .push(node.getID());
       parentIndexStack.push(0);
@@ -39,16 +44,16 @@ throws OmniException{
         returnedFromLeaf = true;
         continue;
       }
-      
+
       if(!node.isLeaf() && (!returnedFromLeaf) ){
         parentIDStack   .push(node.getID());
-        parentIndexStack.push(nodeIndex);
+        parentIndexStack.push(nodeIndex   );
         node      = tree.fetchNode(node.getChildrenIDArray()[nodeIndex]);
         nodeIndex = 0;
         continue;
       }
-      
-      TreeObjectInterface key = node.getKeyArray()[nodeIndex];
+
+      TreeObject key = node.getKeyArray()[nodeIndex];
       long keyData = key.getData();
       for(int i=sequenceLength-1;i>-1;i--){
         outData.write(VAL_TO_BASEPAIR[(int)((keyData>>(2*i))&0x3)]);
@@ -57,10 +62,10 @@ throws OmniException{
       outData.newLine();
       nodeIndex++;
       returnedFromLeaf = false;
-      
+
       if(!node.isLeaf() && (nodeIndex==node.getNKeys())){
         parentIDStack   .push(node.getID());
-        parentIndexStack.push(nodeIndex);
+        parentIndexStack.push(nodeIndex   );
         node      = tree.fetchNode(node.getChildrenIDArray()[nodeIndex]);
         nodeIndex = 0;
       }
@@ -75,4 +80,4 @@ throws OmniException{
 
 
 
-} // class DebugFileDump_Stub
+} // class DebugFileDump
