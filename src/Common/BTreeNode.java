@@ -10,32 +10,27 @@ public class BTreeNode{
 
 
 // STATE DATA ==================================================================
-int btreeDegree = 0;
-int nodeID      = 0;
-int maxChildren = 0;
-int maxKeys     = 0;
-int nKeys       = 0;
-boolean      leafFlag;
-TreeObject[] keyArray;
-int[]        childrenIDArray;
+private int                nodeID;
+private int                nKeys;
+private boolean            leafFlag;
+private final TreeObject[] keyArray;
+private final int[]        childrenIDArray;
+private final int          maxChildren;
+private final int          maxKeys;
 // STATE DATA ==================================================================
 
 
-// setDegree() =================================================================
-/** Sets the BTree degree of the node.
-  * @param degree Degree value.                                               */
-public void setDegree(int degree){
+// BTreeNode() =================================================================
+public BTreeNode(int degree){
   if(degree<2)throw new RuntimeException("Invalid BTree degree size.");
   
-  btreeDegree = degree;
   maxChildren = degree*2;
-  maxKeys     = (degree*2)-1;
-  
+  maxKeys     = maxChildren-1;
+
   childrenIDArray = new int[maxChildren];
   keyArray        = new TreeObject[maxKeys];
-  for(int i=0;i<maxKeys;i++)keyArray[i] = new TreeObject();
 }
-// setDegree() =================================================================
+// BTreeNode() =================================================================
 
 
 // getID() =====================================================================
@@ -106,10 +101,17 @@ public int[] getChildrenIDArray(){return childrenIDArray;}
   * @param key Key to search for.
   * @return Reference to key with matching data.                              */
 public TreeObject searchKey(TreeObject key){
-  for(int i=0;i<nKeys;i++){
-    if(keyArray[i].compareTo(key)==0)return keyArray[i];
+  int lo = -1;
+  int hi = nKeys;
+  while(true){
+    int i = (hi+lo)/2;
+    if(i==lo)i++;
+    if(i==hi)return null;
+    int comparison = keyArray[i].compareTo(key);
+    if     (comparison<0)lo = i;
+    else if(comparison>0)hi = i;
+    else return keyArray[i];
   }
-  return null;
 }
 // searchKey() =================================================================
 
@@ -124,21 +126,24 @@ public byte[] convertToBinaryBlob(){
   
   int offset = 0;
   
-  for(int i=0;i<4;i++)blob[i+offset] = (byte)((nKeys>>((3-i)*8)) & 0xFF);
+  for(int i=0;i<4;i++){
+    blob[i+offset] = (byte)((nKeys>>((3-i)*8)) & 0xFF);
+  }
   offset += 4;
   
-  for(int j=0;j<maxKeys;j++){
-    TreeObject key = keyArray[j];
-    byte[] keyBlob = key.convertToBinaryBlob();
+  for(int i=0;i<nKeys;i++){
+    byte[] keyBlob = keyArray[i].convertToBinaryBlob();
     System.arraycopy(keyBlob,0,blob,offset,keyBlobSize);
     offset += keyBlobSize;
   }
+  offset += (maxKeys-nKeys) * keyBlobSize;
   
-  for(int j=0;j<maxChildren;j++){
-    int childID = childrenIDArray[j];
-    for(int i=0;i<4;i++)blob[i+offset] = (byte)((childID>>((3-i)*8)) & 0xFF);
+  for(int i=0,iS=nKeys+1;i<iS;i++){
+    int childID = childrenIDArray[i];
+    for(int j=0;j<4;j++)blob[j+offset] = (byte)((childID>>((3-j)*8)) & 0xFF);
     offset += 4;
   }
+  offset += (maxChildren-(nKeys+1)) * 4;
   
   blob[offset] = (byte)(leafFlag ? 1 : 0);
   
@@ -161,22 +166,24 @@ public void convertFromBinaryBlob(byte[] blob){
   }
   offset += 4;
   
-  for(int j=0;j<maxKeys;j++){
+  for(int i=0;i<nKeys;i++){
     byte[] keyBlob = Arrays.copyOfRange(blob,offset,offset+keyBlobSize);
     TreeObject keyObj = new TreeObject();
     keyObj.convertFromBinaryBlob(keyBlob);
-    keyArray[j] = keyObj;
+    keyArray[i] = keyObj;
     offset += keyBlobSize;
   }
+  offset += (maxKeys-nKeys) * keyBlobSize;
   
-  for(int j=0;j<maxChildren;j++){
+  for(int i=0,iS=nKeys+1;i<iS;i++){
     int childID = 0;
-    for(int i=0;i<4;i++){
-      childID |= (((int)blob[i+offset])&0xFF) << ((3-i)*8);
+    for(int j=0;j<4;j++){
+      childID |= (((int)blob[j+offset])&0xFF) << ((3-j)*8);
     }
-    childrenIDArray[j] = childID;
+    childrenIDArray[i] = childID;
     offset += 4;
   }
+  offset += (maxChildren-(nKeys+1)) * 4;
   
   leafFlag = (blob[offset]==1);
 }

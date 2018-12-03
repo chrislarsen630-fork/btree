@@ -26,6 +26,7 @@ private int    arg_debugLevel = 0;
   * the execute() method.
   * @param args Command-line arguments                                        */
 public static void main(String[] args){
+  System.out.println();
   try{
     (new GeneBankSearch()).execute(args);
   }catch(Throwable e){
@@ -34,6 +35,7 @@ public static void main(String[] args){
       System.out.println("Error message: \""+e.getMessage()+"\"");
     }
   }
+  System.out.println();
 }
 // main() ======================================================================
 
@@ -114,7 +116,6 @@ private void displayUsage(){
   System.out.println("  query_file   File path to DNA sequence file"          );
   System.out.println("  cache_size   Size of the cache (in entries)"          );
   System.out.println("  debug_level  Create dump file (0=no, 1=yes)"          );
-  System.out.println(                                                         );
 }
 // displayUsage() ==============================================================
 

@@ -14,9 +14,9 @@ private Scanner parser;
 
 private String[] buffer;
 private String   mergedBuffer;
-private int      mergedBufferIndex = 0;
+private int      mergedBufferIndex;
 
-private int dataWindowSize = 0;
+private int dataWindowSize;
 
 // look up tables
 final private boolean[] END_CHARACTER = new boolean[256];
@@ -26,13 +26,13 @@ final private int[]     BASE_TO_VAL   = new int    [256];
 
 // GeneBankFile() ==============================================================
 public GeneBankFile(){
-  END_CHARACTER[0x4E] = END_CHARACTER[0x6E] = true;
+  END_CHARACTER['N'] = END_CHARACTER['n'] = true;
 
-  for(int i=0;i<256;i++)BASE_TO_VAL[i] = 4;
-  BASE_TO_VAL[0x41] = BASE_TO_VAL[0x61] = 0;
-  BASE_TO_VAL[0x43] = BASE_TO_VAL[0x63] = 1;
-  BASE_TO_VAL[0x47] = BASE_TO_VAL[0x67] = 2;
-  BASE_TO_VAL[0x54] = BASE_TO_VAL[0x74] = 3;
+  Arrays.fill(BASE_TO_VAL,4);
+  BASE_TO_VAL['A'] = BASE_TO_VAL['a'] = 0;
+  BASE_TO_VAL['C'] = BASE_TO_VAL['c'] = 1;
+  BASE_TO_VAL['G'] = BASE_TO_VAL['g'] = 2;
+  BASE_TO_VAL['T'] = BASE_TO_VAL['t'] = 3;
 }
 // GeneBankFile() ==============================================================
 
@@ -50,11 +50,9 @@ public void loadFromFile(String file,int windowSize) throws OmniException{
     parser = new Scanner(createFlatFile(file));
     
     buffer = new String[2];
-    buffer[0] = (parser.hasNext() ? parser.next() : null);
-    buffer[1] = (parser.hasNext() ? parser.next() : null);
-    mergedBuffer = (
-      (buffer[0]!=null ? buffer[0] : "") + (buffer[1]!=null ? buffer[1] : "")
-    );
+    buffer[0] = (parser.hasNext() ? parser.next() : "");
+    buffer[1] = (parser.hasNext() ? parser.next() : "");
+    mergedBuffer = buffer[0] + buffer[1];
   }catch(FileNotFoundException e){
     throw new OmniException(
       OmniException.FILE_ACCESS,
@@ -95,9 +93,9 @@ public long readData() throws OmniException{
     for(int i=0;i<dataWindowSize;i++){
       char c  = mergedBuffer.charAt(mergedBufferIndex+i);
       int val = BASE_TO_VAL[c];
-      if(val==4){System.out.println("!"+c+"!");throw new OmniException(
+      if(val==4)throw new OmniException(
         OmniException.FILE_READ_ERROR,"Read malformed data in source file."
-      );}
+      );
       ret = (ret<<2) | val;
     }
     incrementBufferIndex();
