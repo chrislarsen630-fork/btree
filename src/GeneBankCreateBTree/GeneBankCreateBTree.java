@@ -200,7 +200,7 @@ private int getOptimalBTreeDegree(int pageSize){
   // Not the most elegant approach, but reliable.
   for(int i=3;i<=pageSize;i++){
     BTreeNode node = new BTreeNode(i);
-    byte[] nodeBlob = node.convertToBinaryBlob();
+    byte[] nodeBlob = node.convertToBinaryBlob(0);
     if(nodeBlob.length>pageSize)break;
     lastGoodDegree = i;
   }

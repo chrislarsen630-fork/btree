@@ -118,11 +118,12 @@ public TreeObject searchKey(TreeObject key){
 
 // convertToBinaryBlob() =======================================================
 /** Returns a binary blob of the node.
+  * @param padding Extra bytes to append to blob.
   * @return Binary version of the node.                                       */
-public byte[] convertToBinaryBlob(){
+public byte[] convertToBinaryBlob(int padding){
   int keyBlobSize = (new TreeObject()).convertToBinaryBlob().length;
 
-  byte[] blob = new byte[4 + maxKeys*keyBlobSize + maxChildren*4 + 1];
+  byte[] blob = new byte[4 + maxKeys*keyBlobSize + maxChildren*4 + 1 + padding];
   
   int offset = 0;
   
