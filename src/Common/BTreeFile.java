@@ -52,7 +52,7 @@ throws OmniException{
 
   // determine maximum node size
   BTreeNode dummyNode = new BTreeNode(degree);
-  nodeSize = dummyNode.convertToBinaryBlob().length;
+  nodeSize = dummyNode.convertToBinaryBlob(0).length;
   if( (nodeSize<4096) && (4096-nodeSize<64)){
     nodePad = 4096 - nodeSize;
   }
@@ -143,8 +143,7 @@ public BTreeNode allocateNode() throws OmniException{
     BTreeNode node = new BTreeNode(btreeDegree);
     node.setID    (nodeCount+1);
     filePtr.seek(pos);
-    filePtr.write(node.convertToBinaryBlob());
-    if(nodePad>0)filePtr.write(new byte[nodePad]);
+    filePtr.write(node.convertToBinaryBlob(nodePad));
 
     nodeCount++;
     writeHeader();
@@ -170,7 +169,7 @@ public void writeNode(BTreeNode node) throws OmniException{
   
   try{
     filePtr.seek(headerSize + ((node.getID()-1) * nodeTotal));
-    filePtr.write(node.convertToBinaryBlob());
+    filePtr.write(node.convertToBinaryBlob(0));
   }catch(IOException e){
     throw new OmniException(
       OmniException.FILE_WRITE_ERROR,"Unable to create node in BTree file."
