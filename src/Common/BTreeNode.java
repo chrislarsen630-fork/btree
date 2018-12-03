@@ -29,7 +29,6 @@ public BTreeNode(int degree){
 
   childrenIDArray = new int[maxChildren];
   keyArray        = new TreeObject[maxKeys];
-  //for(int i=0;i<maxKeys;i++)keyArray[i] = new TreeObject();  
 }
 // BTreeNode() =================================================================
 
@@ -104,12 +103,10 @@ public int[] getChildrenIDArray(){return childrenIDArray;}
 public TreeObject searchKey(TreeObject key){
   int lo = -1;
   int hi = nKeys;
-  
   while(true){
     int i = (hi+lo)/2;
     if(i==lo)i++;
     if(i==hi)return null;
-    
     int comparison = keyArray[i].compareTo(key);
     if     (comparison<0)lo = i;
     else if(comparison>0)hi = i;
