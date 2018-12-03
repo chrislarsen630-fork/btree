@@ -10,6 +10,11 @@ public class DebugFileDumper{
 
 
 
+// STATE DATA ==================================================================
+private final char[] VAL_TO_BASEPAIR = {'a','c','g','t'};
+// STATE DATA ==================================================================
+
+
 // dumpBTreeToFile() ===========================================================
 /** Dumps the BTree to file.
  * @param tree BTree to dump.
@@ -18,12 +23,6 @@ public class DebugFileDumper{
  * @throws Common.OmniException on file access or read error.                 */
 public void dumpBTreeToFile(BTree tree,String file,int sequenceLength)
 throws OmniException{
-  final char[] VAL_TO_BASEPAIR = new char[4];
-  VAL_TO_BASEPAIR[0] = 'a';
-  VAL_TO_BASEPAIR[1] = 'c';
-  VAL_TO_BASEPAIR[2] = 'g';
-  VAL_TO_BASEPAIR[3] = 't';
-
   try(BufferedWriter outData = new BufferedWriter(new FileWriter(file))){
     Stack<Integer> parentIDStack    = new java.util.Stack<>();
     Stack<Integer> parentIndexStack = new java.util.Stack<>();

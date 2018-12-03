@@ -51,8 +51,7 @@ throws OmniException{
   }
 
   // determine maximum node size
-  BTreeNode dummyNode = new BTreeNode();
-  dummyNode.setDegree(degree);
+  BTreeNode dummyNode = new BTreeNode(degree);
   nodeSize = dummyNode.convertToBinaryBlob().length;
   if( (nodeSize<4096) && (4096-nodeSize<64)){
     nodePad = 4096 - nodeSize;
@@ -117,8 +116,7 @@ public BTreeNode readNode(int nodeID) throws OmniException{
     byte[] blob = new byte[nodeSize];
     filePtr.seek(headerSize + ((nodeID-1) * nodeTotal));
     filePtr.read(blob);
-    BTreeNode node = new BTreeNode();
-    node.setDegree(btreeDegree);
+    BTreeNode node = new BTreeNode(btreeDegree);
     node.setID(nodeID);
     node.convertFromBinaryBlob(blob);
     return node;
@@ -142,9 +140,8 @@ public BTreeNode allocateNode() throws OmniException{
 
     // write node
     filePtr.seek(pos);
-    BTreeNode node = new BTreeNode();
+    BTreeNode node = new BTreeNode(btreeDegree);
     node.setID    (nodeCount+1);
-    node.setDegree(btreeDegree);
     filePtr.seek(pos);
     filePtr.write(node.convertToBinaryBlob());
     if(nodePad>0)filePtr.write(new byte[nodePad]);

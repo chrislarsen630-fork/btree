@@ -44,6 +44,7 @@ public static void main(String[] args){
 private void execute(String[] args){
   long performanceTimer = System.currentTimeMillis();
   
+  // parse arguments
   if(!parseArguments(args)){
     displayUsage();
     return;
@@ -52,6 +53,7 @@ private void execute(String[] args){
   String btreeFileName     = arg_gbkFile+".btree.data."+arg_sequenceLength+"."+arg_btreeDegree;
   String btreeDumpFileName = arg_gbkFile+".btree.dump."+arg_sequenceLength;
 
+  // display output info
   System.out.println("+ + + GeneBankCreateBTree + + +"                        );
   System.out.println(                                                         );
   System.out.print("A binary BTree file named "+btreeFileName+" of degree "   );
@@ -67,6 +69,7 @@ private void execute(String[] args){
   System.out.println(" will be created."                                      );
   System.out.println(                                                         );
 
+  // parse GBK file
   System.out.print("Parsing GBK file...");
   GeneBankFile geneFile = new GeneBankFile();
   try{
@@ -77,6 +80,7 @@ private void execute(String[] args){
   }
   System.out.println("OK.");
 
+  // initialize BTree
   System.out.print("Initializing BTree...");
   BTree tree = new BTree();
   try{
@@ -88,6 +92,7 @@ private void execute(String[] args){
   }
   System.out.println("OK.");
 
+  // populate BTree
   System.out.print("Populating BTree. Standby.");
   try{
     do{
@@ -105,6 +110,7 @@ private void execute(String[] args){
   System.out.println();
   System.out.println("Successfully populated BTree.");
   
+  // write debug file
   if(arg_debugLevel==1){
     try{
       System.out.print("Writing debug dump file...");
@@ -114,7 +120,10 @@ private void execute(String[] args){
     }catch(OmniException e){System.out.println("FAILED.");}
   }
   
+  // cleanup
   tree.dealloc();
+
+  // display runtime
   long runtime = (System.currentTimeMillis() - performanceTimer) / 1000;
   System.out.println();
   System.out.println("Program complete in "+runtime+" seconds.");
@@ -137,7 +146,6 @@ private void displayUsage(){
   System.out.println("  sequence_length  Length of DNA sequences (1 to 31)");
   System.out.println("  cache_size       Size of the cache (in entries)"   );
   System.out.println("  debug_level      Create dump file (0=no, 1=yes)"   );
-  System.out.println(                                                      );
 }
 // displayUsage() ==============================================================
 
@@ -189,10 +197,9 @@ private boolean parseArguments(String[] args){
 private int getOptimalBTreeDegree(int pageSize){
   int lastGoodDegree = 2;
 
-  // Not the most elegant approach, but the most reliable.
-  BTreeNode node = new BTreeNode();
+  // Not the most elegant approach, but reliable.
   for(int i=3;i<=pageSize;i++){
-    node.setDegree(i);
+    BTreeNode node = new BTreeNode(i);
     byte[] nodeBlob = node.convertToBinaryBlob();
     if(nodeBlob.length>pageSize)break;
     lastGoodDegree = i;

@@ -11,8 +11,8 @@ public class BTree{
 private BTreeFile  btreeFile;
 private BTreeCache btreeCache;
 private BTreeNode  rootNode;
-private int btreeDegree   = 0;
-private int cacheCapacity = 0;
+private int        btreeDegree;
+private int        cacheCapacity;
 // STATE DATA ==================================================================
 
 
@@ -129,11 +129,15 @@ public void dealloc(){btreeFile.close();}
   * @throws OmniException on file read error.                              
   * @return Node matching the ID.                                             */
 public BTreeNode fetchNode(int id) throws OmniException{
-  if(id==rootNode.getID())return rootNode;
+  if(rootNode.getID()==id)return rootNode;
+  
+  // check the cache
   if(cacheCapacity>0){
     BTreeNode ret = btreeCache.searchNode(id);
     if(ret!=null)return ret;
   }
+  
+  // not cached, read from file
   return btreeFile.readNode(id);
 }
 // fetchNode() =================================================================
@@ -150,13 +154,24 @@ private void dispatchNode(BTreeNode node) throws OmniException{
 
 // b_tree_search() =============================================================
 private BTreeNode b_tree_search(BTreeNode x,TreeObject k) throws OmniException{
-  int i  = 0;
-  int xN = x.getNKeys();
   TreeObject[] xKey = x.getKeyArray();
-  for(;(i<xN)&&(k.compareTo(xKey[i])>0);i++){}
-  if( (i<xN) && (k.compareTo(xKey[i])==0) )return x;
+  
+  // perform binary search of node
+  int lo = -1;
+  int hi = x.getNKeys();
+  while(true){
+    int i = (hi+lo)/2;
+    if(i==lo)i++;
+    if(i==hi)break;  
+    int comparison = k.compareTo(xKey[i]);
+    if     (comparison>0)lo = i;
+    else if(comparison<0)hi = i;
+    else return x;
+  }
+
+  // check child nodes
   if(x.isLeaf())return null;
-  int xCID = x.getChildrenIDArray()[i];
+  int xCID = x.getChildrenIDArray()[hi];
   if(xCID<1)return null;
   return b_tree_search(fetchNode(xCID),k);
 }
@@ -165,26 +180,32 @@ private BTreeNode b_tree_search(BTreeNode x,TreeObject k) throws OmniException{
 
 // b_tree_split_child() ========================================================
 private void b_tree_split_child(BTreeNode x,int i,BTreeNode y) throws OmniException{
-  int t  = btreeDegree;
   int xN = x.getNKeys();
   BTreeNode z = btreeFile.allocateNode();
   z.setLeaf(y.isLeaf());
-  z.setNKeys(t-1);
+  z.setNKeys(btreeDegree-1);
   TreeObject[] xKey = x.getKeyArray();
   TreeObject[] yKey = y.getKeyArray();
-  TreeObject[] zKey = z.getKeyArray();
   int[] xC = x.getChildrenIDArray();
-  int[] yC = y.getChildrenIDArray();
-  int[] zC = z.getChildrenIDArray();
-  for(int j=0;j<t-1;j++)zKey[j] = yKey[j+t];
+
+  //for(int j=0;j<t-1;j++)zKey[j] = yKey[j+t];
+  System.arraycopy(yKey,btreeDegree,z.getKeyArray(),0,btreeDegree-1);
+
   if(!y.isLeaf()){
-    for(int j=0;j<t;j++)zC[j] = yC[j+t];
+    //for(int j=0;j<t;j++)zC[j] = yC[j+t];
+    System.arraycopy(y.getChildrenIDArray(),btreeDegree,z.getChildrenIDArray(),0,btreeDegree);
   }
-  y.setNKeys(t-1);
-  for(int j=xN;j>=i+1;j--)xC[j+1] = xC[j];
+  y.setNKeys(btreeDegree-1);
+
+  //for(int j=xN;j>=i+1;j--)xC[j+1] = xC[j];
+  System.arraycopy(xC,i+1,xC,i+2,xN-i);
+  
   xC[i+1] = z.getID();
-  for(int j=xN-1;j>=i;j--)xKey[j+1] = xKey[j];
-  xKey[i] = yKey[t-1];
+
+  // for(int j=xN-1;j>=i;j--)xKey[j+1] = xKey[j];
+  System.arraycopy(xKey,i,xKey,i+1,xN-i);
+
+  xKey[i] = yKey[btreeDegree-1];
   x.setNKeys(xN+1);
   dispatchNode(y);
   dispatchNode(z);
@@ -196,21 +217,39 @@ private void b_tree_split_child(BTreeNode x,int i,BTreeNode y) throws OmniExcept
 // b_tree_insert_nonfull() =====================================================
 private void b_tree_insert_nonfull(BTreeNode x,TreeObject k)
 throws OmniException{
-  int t  = btreeDegree;
   int xN = x.getNKeys();
-  int i  = xN-1;
   TreeObject[] xKey = x.getKeyArray();
   int[] xC = x.getChildrenIDArray();
+
+  int i = xN-1;
+  //for(;i>-1;i--)if(k.compareTo(xKey[i])>=0)break;
+  //i++;
+  int lo = -1;
+  int hi = xN;
+  while(true){
+    i = (hi+lo)/2;
+    if(i==lo)i++;
+    if(i==hi)break;
+    int comparison = k.compareTo(xKey[i]);
+    if     (comparison>0)lo = i;
+    else if(comparison<0)hi = i;
+    else break;
+  }
+
   if(x.isLeaf()){
-    for(;(i>=0)&&(k.compareTo(xKey[i])<0);i--)xKey[i+1] = xKey[i];
-    xKey[i+1] = k;
+    //for(;(i>=0)&&(k.compareTo(xKey[i])<0);i--)xKey[i+1] = xKey[i];
+    //xKey[i+1] = k;
+    System.arraycopy(xKey,i,xKey,i+1,xN-i);
+    xKey[i] = k;
+    
     x.setNKeys(xN+1);
     dispatchNode(x);
   }else{
-    for(;(i>=0)&&(k.compareTo(xKey[i])<0);i--){}
-    i++;
+    //for(;i>-1;i--)if(k.compareTo(xKey[i])>=0)break;
+    //i++;
+
     BTreeNode xCi = fetchNode(xC[i]);
-    if(xCi.getNKeys()==2*t-1){
+    if(xCi.getNKeys()==2*btreeDegree-1){
       b_tree_split_child(x,i,xCi);
       if(k.compareTo(xKey[i])>0)i++;
     }
@@ -223,10 +262,9 @@ throws OmniException{
 
 // b_tree_insert() =============================================================
 private void b_tree_insert(TreeObject k) throws OmniException{
-  int t = btreeDegree;
   BTreeNode r = rootNode;
   int rN = r.getNKeys();
-  if(rN==2*t-1){
+  if(rN==2*btreeDegree-1){
     rootNode = btreeFile.allocateNode();
     rootNode.setLeaf(false);
     rootNode.setNKeys(0);
