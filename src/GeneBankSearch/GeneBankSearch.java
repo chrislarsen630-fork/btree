@@ -26,7 +26,6 @@ private int    arg_debugLevel = 0;
   * the execute() method.
   * @param args Command-line arguments                                        */
 public static void main(String[] args){
-  System.out.println();
   try{
     (new GeneBankSearch()).execute(args);
   }catch(Throwable e){
@@ -35,7 +34,6 @@ public static void main(String[] args){
       System.out.println("Error message: \""+e.getMessage()+"\"");
     }
   }
-  System.out.println();
 }
 // main() ======================================================================
 
@@ -45,7 +43,9 @@ public static void main(String[] args){
   * @param args Command-line arguments                                        */
 private void execute(String[] args){
   if(!parseArguments(args)){
+    System.out.println();
     displayUsage();
+    System.out.println();
     return;
   }
   try {
