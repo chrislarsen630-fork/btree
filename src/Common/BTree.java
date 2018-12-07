@@ -138,7 +138,9 @@ public BTreeNode fetchNode(int id) throws OmniException{
   }
   
   // not cached, read from file
-  return btreeFile.readNode(id);
+  BTreeNode ret = btreeFile.readNode(id);
+  if((ret!=null)&&(cacheCapacity>0))btreeCache.insertNode(ret);
+  return ret;
 }
 // fetchNode() =================================================================
 
